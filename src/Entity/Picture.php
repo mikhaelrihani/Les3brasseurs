@@ -2,28 +2,26 @@
 
 namespace App\Entity;
 
-use App\Repository\DateRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\PictureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: DateRepository::class)]
-class Date
+#[ORM\Entity(repositoryClass: PictureRepository::class)]
+class Picture
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $year = null;
+    #[ORM\Column(length: 255)]
+    private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $month = null;
+    private ?string $name = null;
 
-    #[ORM\Column]
-    private ?int $day = null;
+    #[ORM\Column(length: 255)]
+    private ?string $path = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
@@ -36,38 +34,38 @@ class Date
         return $this->id;
     }
 
-    public function getYear(): ?int
+    public function getSlug(): ?string
     {
-        return $this->year;
+        return $this->slug;
     }
 
-    public function setYear(int $year): static
+    public function setSlug(string $slug): static
     {
-        $this->year = $year;
+        $this->slug = $slug;
 
         return $this;
     }
 
-    public function getMonth(): ?string
+    public function getName(): ?string
     {
-        return $this->month;
+        return $this->name;
     }
 
-    public function setMonth(string $month): static
+    public function setName(string $name): static
     {
-        $this->month = $month;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getDay(): ?int
+    public function getPath(): ?string
     {
-        return $this->day;
+        return $this->path;
     }
 
-    public function setDay(int $day): static
+    public function setPath(string $path): static
     {
-        $this->day = $day;
+        $this->path = $path;
 
         return $this;
     }
@@ -95,5 +93,4 @@ class Date
 
         return $this;
     }
-
 }

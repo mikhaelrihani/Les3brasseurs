@@ -17,9 +17,9 @@ class Inventory
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
-    #[ORM\ManyToOne(inversedBy: 'inventories')]
+    #[ORM\ManyToOne(targetEntity: Date::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Date $date_id = null;
+    private ?Date $date = null;
 
     #[ORM\Column(length: 255)]
     private ?string $status = null;
@@ -49,12 +49,12 @@ class Inventory
 
     public function getDateId(): ?Date
     {
-        return $this->date_id;
+        return $this->date;
     }
 
     public function setDateId(?Date $date_id): static
     {
-        $this->date_id = $date_id;
+        $this->date = $date_id;
 
         return $this;
     }

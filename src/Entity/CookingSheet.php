@@ -2,28 +2,27 @@
 
 namespace App\Entity;
 
-use App\Repository\DateRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\CookingSheetRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: DateRepository::class)]
-class Date
+#[ORM\Entity(repositoryClass: CookingSheetRepository::class)]
+class CookingSheet
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $year = null;
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $month = null;
+    private ?string $slug = null;
 
-    #[ORM\Column]
-    private ?int $day = null;
+    #[ORM\ManyToOne(inversedBy: 'cookingSheets')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?cookingCategory $cookingCategories_id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
@@ -36,38 +35,38 @@ class Date
         return $this->id;
     }
 
-    public function getYear(): ?int
+    public function getName(): ?string
     {
-        return $this->year;
+        return $this->name;
     }
 
-    public function setYear(int $year): static
+    public function setName(string $name): static
     {
-        $this->year = $year;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getMonth(): ?string
+    public function getSlug(): ?string
     {
-        return $this->month;
+        return $this->slug;
     }
 
-    public function setMonth(string $month): static
+    public function setSlug(string $slug): static
     {
-        $this->month = $month;
+        $this->slug = $slug;
 
         return $this;
     }
 
-    public function getDay(): ?int
+    public function getCookingCategoriesId(): ?cookingCategory
     {
-        return $this->day;
+        return $this->cookingCategories_id;
     }
 
-    public function setDay(int $day): static
+    public function setCookingCategoriesId(?cookingCategory $cookingCategories_id): static
     {
-        $this->day = $day;
+        $this->cookingCategories_id = $cookingCategories_id;
 
         return $this;
     }
@@ -95,5 +94,4 @@ class Date
 
         return $this;
     }
-
 }

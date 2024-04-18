@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CookingCategoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,6 +24,17 @@ class CookingCategory
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
+
+    /**
+     * @var Collection<int, CookingSheet>
+     */
+    #[ORM\OneToMany(targetEntity: CookingSheet::class, mappedBy: 'cookingCategories_id')]
+    private Collection $cookingSheets;
+
+    public function __construct()
+    {
+        $this->cookingSheets = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -60,6 +73,36 @@ class CookingCategory
     public function setUpdatedAt(\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CookingSheet>
+     */
+    public function getCookingSheets(): Collection
+    {
+        return $this->cookingSheets;
+    }
+
+    public function addCookingSheet(CookingSheet $cookingSheet): static
+    {
+        if (!$this->cookingSheets->contains($cookingSheet)) {
+            $this->cookingSheets->add($cookingSheet);
+            $cookingSheet->setCookingCategoriesId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCookingSheet(CookingSheet $cookingSheet): static
+    {
+        if ($this->cookingSheets->removeElement($cookingSheet)) {
+            // set the owning side to null (unless already changed)
+            if ($cookingSheet->getCookingCategoriesId() === $this) {
+                $cookingSheet->setCookingCategoriesId(null);
+            }
+        }
 
         return $this;
     }

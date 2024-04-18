@@ -47,6 +47,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?UserInfos $userInfos = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -180,4 +183,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getUserInfos(): ?UserInfos
+    {
+        return $this->userInfos;
+    }
+
+    public function setUserInfos(UserInfos $userInfos): static
+    {
+        // set the owning side of the relation if necessary
+        if ($userInfos->getUser() !== $this) {
+            $userInfos->setUser($this);
+        }
+
+        $this->userInfos = $userInfos;
+
+        return $this;
+    }
+
 }

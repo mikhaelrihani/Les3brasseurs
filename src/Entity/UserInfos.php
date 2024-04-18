@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserInfosRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,9 +23,6 @@ class UserInfos
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $email = null;
-
-    #[ORM\Column(length: 255)]
     private ?string $whatsApp = null;
 
     #[ORM\Column(length: 255)]
@@ -34,6 +33,21 @@ class UserInfos
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
+
+    #[ORM\OneToOne(inversedBy: 'userInfos', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?user $user = null;
+
+    /**
+     * @var Collection<int, email>
+     */
+    #[ORM\OneToMany(targetEntity: email::class, mappedBy: 'sender', orphanRemoval: true)]
+    private Collection $emails;
+
+    public function __construct()
+    {
+        $this->emails = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -60,18 +74,6 @@ class UserInfos
     public function setPhone(string $phone): static
     {
         $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
 
         return $this;
     }
@@ -123,4 +125,47 @@ class UserInfos
 
         return $this;
     }
+
+    public function getUser(): ?user
+    {
+        return $this->user;
+    }
+
+    public function setUser(user $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, email>
+     */
+    public function getEmails(): Collection
+    {
+        return $this->emails;
+    }
+
+    public function addEmail(email $email): static
+    {
+        if (!$this->emails->contains($email)) {
+            $this->emails->add($email);
+            $email->setSender($this->getUser());
+        }
+
+        return $this;
+    }
+
+    public function removeEmail(email $email): static
+    {
+        if ($this->emails->removeElement($email)) {
+            // set the owning side to null (unless already changed)
+            if ($email->getSender() === $this) {
+                $email->setSender(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
