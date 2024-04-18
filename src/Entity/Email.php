@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EmailRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -36,9 +38,27 @@ class Email
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'emails')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?user $sender = null;
+
+    /**
+     * @var Collection<int, user>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    private Collection $receivers;
+
+    /**
+     * @var Collection<int, file>
+     */
+    #[ORM\ManyToMany(targetEntity: File::class)]
+    private Collection $files;
+
+    public function __construct()
+    {
+        $this->receivers = new ArrayCollection();
+        $this->files = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -140,5 +160,55 @@ class Email
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, user>
+     */
+    public function getReceivers(): Collection
+    {
+        return $this->receivers;
+    }
+
+    public function addReceiver(user $receiver): static
+    {
+        if (!$this->receivers->contains($receiver)) {
+            $this->receivers->add($receiver);
+        }
+
+        return $this;
+    }
+
+    public function removeReceiver(user $receiver): static
+    {
+        $this->receivers->removeElement($receiver);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, file>
+     */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(file $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(file $file): static
+    {
+        $this->files->removeElement($file);
+
+        return $this;
+    }
+
+   
 
 }

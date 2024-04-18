@@ -38,16 +38,9 @@ class UserInfos
     #[ORM\JoinColumn(nullable: false)]
     private ?user $user = null;
 
-    /**
-     * @var Collection<int, email>
-     */
-    #[ORM\OneToMany(targetEntity: email::class, mappedBy: 'sender', orphanRemoval: true)]
-    private Collection $emails;
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
 
-    public function __construct()
-    {
-        $this->emails = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -138,32 +131,14 @@ class UserInfos
         return $this;
     }
 
-    /**
-     * @return Collection<int, email>
-     */
-    public function getEmails(): Collection
+    public function getEmail(): ?string
     {
-        return $this->emails;
+        return $this->email;
     }
 
-    public function addEmail(email $email): static
+    public function setEmail(string $email): static
     {
-        if (!$this->emails->contains($email)) {
-            $this->emails->add($email);
-            $email->setSender($this->getUser());
-        }
-
-        return $this;
-    }
-
-    public function removeEmail(email $email): static
-    {
-        if ($this->emails->removeElement($email)) {
-            // set the owning side to null (unless already changed)
-            if ($email->getSender() === $this) {
-                $email->setSender(null);
-            }
-        }
+        $this->email = $email;
 
         return $this;
     }

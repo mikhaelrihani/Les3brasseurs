@@ -31,21 +31,10 @@ class File
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    /**
-     * @var Collection<int, EmailFile>
-     */
-    #[ORM\ManyToMany(targetEntity: EmailFile::class, mappedBy: 'file_id')]
-    private Collection $emailFiles;
-
+  
     #[ORM\ManyToOne(targetEntity: Mime::class)]
     #[ORM\JoinColumn(name: "mime_id", referencedColumnName: "id", nullable: false)]
     private ?Mime $mime = null;
-
-
-    public function __construct()
-    {
-        $this->emailFiles = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -108,33 +97,6 @@ class File
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, EmailFile>
-     */
-    public function getEmailFiles(): Collection
-    {
-        return $this->emailFiles;
-    }
-
-    public function addEmailFile(EmailFile $emailFile): static
-    {
-        if (!$this->emailFiles->contains($emailFile)) {
-            $this->emailFiles->add($emailFile);
-            $emailFile->addFileId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEmailFile(EmailFile $emailFile): static
-    {
-        if ($this->emailFiles->removeElement($emailFile)) {
-            $emailFile->removeFileId($this);
-        }
 
         return $this;
     }
