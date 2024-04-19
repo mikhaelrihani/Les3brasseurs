@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\NotificationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,7 +28,7 @@ class Notification
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $comment = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -34,6 +36,17 @@ class Notification
 
     #[ORM\Column(length: 255)]
     private ?string $datetime = null;
+
+    /**
+     * @var Collection<int, group>
+     */
+    #[ORM\ManyToMany(targetEntity: group::class)]
+    private Collection $groupUser;
+
+    public function __construct()
+    {
+        $this->groupUser = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -120,6 +133,30 @@ class Notification
     public function setDatetime(string $datetime): static
     {
         $this->datetime = $datetime;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, group>
+     */
+    public function getGroupUser(): Collection
+    {
+        return $this->groupUser;
+    }
+
+    public function addGroupUser(group $groupUser): static
+    {
+        if (!$this->groupUser->contains($groupUser)) {
+            $this->groupUser->add($groupUser);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupUser(group $groupUser): static
+    {
+        $this->groupUser->removeElement($groupUser);
 
         return $this;
     }

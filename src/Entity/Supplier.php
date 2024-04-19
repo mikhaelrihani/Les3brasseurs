@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SupplierRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -20,7 +22,7 @@ class Supplier
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
-    #[ORM\Column(length: 1000)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -31,6 +33,24 @@ class Supplier
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
+
+    /**
+     * @var Collection<int, user>
+     */
+    #[ORM\ManyToMany(targetEntity: user::class)]
+    private Collection $staffs;
+
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'suppliers')]
+    private Collection $products;
+
+    public function __construct()
+    {
+        $this->staffs = new ArrayCollection();
+        $this->products = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,6 +125,57 @@ class Supplier
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, user>
+     */
+    public function getStaffs(): Collection
+    {
+        return $this->staffs;
+    }
+
+    public function addStaff(user $staff): static
+    {
+        if (!$this->staffs->contains($staff)) {
+            $this->staffs->add($staff);
+        }
+
+        return $this;
+    }
+
+    public function removeStaff(user $staff): static
+    {
+        $this->staffs->removeElement($staff);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->addSupplier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            $product->removeSupplier($this);
+        }
 
         return $this;
     }

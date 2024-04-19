@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CookingSheetRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,6 +31,17 @@ class CookingSheet
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
+
+    /**
+     * @var Collection<int, picture>
+     */
+    #[ORM\ManyToMany(targetEntity: picture::class)]
+    private Collection $pictures;
+
+    public function __construct()
+    {
+        $this->pictures = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -91,6 +104,30 @@ class CookingSheet
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, picture>
+     */
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function addPicture(picture $picture): static
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures->add($picture);
+        }
+
+        return $this;
+    }
+
+    public function removePicture(picture $picture): static
+    {
+        $this->pictures->removeElement($picture);
 
         return $this;
     }

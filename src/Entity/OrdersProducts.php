@@ -2,26 +2,28 @@
 
 namespace App\Entity;
 
-use App\Repository\PictureRepository;
+use App\Repository\OrdersProductsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: PictureRepository::class)]
-class Picture
+#[ORM\Entity(repositoryClass: OrdersProductsRepository::class)]
+class OrdersProducts
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $slug = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?order $orders = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?product $product = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $path = null;
+    #[ORM\Column]
+    private ?int $quantity = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
@@ -29,47 +31,43 @@ class Picture
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?mime $mime = null;
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getSlug(): ?string
+    public function getOrders(): ?order
     {
-        return $this->slug;
+        return $this->orders;
     }
 
-    public function setSlug(string $slug): static
+    public function setOrders(?order $orders): static
     {
-        $this->slug = $slug;
+        $this->orders = $orders;
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function getProduct(): ?product
     {
-        return $this->name;
+        return $this->product;
     }
 
-    public function setName(string $name): static
+    public function setProduct(?product $product): static
     {
-        $this->name = $name;
+        $this->product = $product;
 
         return $this;
     }
 
-    public function getPath(): ?string
+    public function getQuantity(): ?int
     {
-        return $this->path;
+        return $this->quantity;
     }
 
-    public function setPath(string $path): static
+    public function setQuantity(int $quantity): static
     {
-        $this->path = $path;
+        $this->quantity = $quantity;
 
         return $this;
     }
@@ -94,18 +92,6 @@ class Picture
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getMime(): ?mime
-    {
-        return $this->mime;
-    }
-
-    public function setMime(?mime $mime): static
-    {
-        $this->mime = $mime;
 
         return $this;
     }

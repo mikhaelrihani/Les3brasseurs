@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\PictureRepository;
+use App\Repository\OrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: PictureRepository::class)]
-class Picture
+#[ORM\Entity(repositoryClass: OrderRepository::class)]
+#[ORM\Table(name: '`order`')]
+class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,18 +21,19 @@ class Picture
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $path = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?supplier $supplier = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?date $date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?mime $mime = null;
 
     public function getId(): ?int
     {
@@ -62,14 +64,26 @@ class Picture
         return $this;
     }
 
-    public function getPath(): ?string
+    public function getSupplier(): ?supplier
     {
-        return $this->path;
+        return $this->supplier;
     }
 
-    public function setPath(string $path): static
+    public function setSupplier(?supplier $supplier): static
     {
-        $this->path = $path;
+        $this->supplier = $supplier;
+
+        return $this;
+    }
+
+    public function getDate(): ?date
+    {
+        return $this->date;
+    }
+
+    public function setDate(?date $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }
@@ -94,18 +108,6 @@ class Picture
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getMime(): ?mime
-    {
-        return $this->mime;
-    }
-
-    public function setMime(?mime $mime): static
-    {
-        $this->mime = $mime;
 
         return $this;
     }

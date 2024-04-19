@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MenuRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -36,6 +38,17 @@ class Menu
 
     #[ORM\Column(length: 255)]
     private ?string $datetime = null;
+
+    /**
+     * @var Collection<int, dish>
+     */
+    #[ORM\ManyToMany(targetEntity: dish::class, inversedBy: 'menus')]
+    private Collection $dishes;
+
+    public function __construct()
+    {
+        $this->dishes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,6 +135,30 @@ class Menu
     public function setDatetime(string $datetime): static
     {
         $this->datetime = $datetime;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, dish>
+     */
+    public function getDishes(): Collection
+    {
+        return $this->dishes;
+    }
+
+    public function addDish(dish $dish): static
+    {
+        if (!$this->dishes->contains($dish)) {
+            $this->dishes->add($dish);
+        }
+
+        return $this;
+    }
+
+    public function removeDish(dish $dish): static
+    {
+        $this->dishes->removeElement($dish);
 
         return $this;
     }
