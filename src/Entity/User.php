@@ -7,6 +7,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_UUID', fields: ['uuid'])]
@@ -17,8 +19,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
-    private ?string $uuid = null;
+    #[ORM\Column(type: UuidType::NAME)]
+    private Uuid $uuid;
 
     /**
      * @var list<string> The user roles
@@ -55,17 +57,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getUuid(): ?string
+    public function getUuid(): ?Uuid
     {
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): static
+    public function setUuid(Uuid $uuid): static
     {
         $this->uuid = $uuid;
 
         return $this;
     }
+
 
     /**
      * A visual identifier that represents this user.
