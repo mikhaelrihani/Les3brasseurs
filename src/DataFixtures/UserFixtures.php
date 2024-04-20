@@ -25,18 +25,19 @@ class UserFixtures extends Fixture
     {
 
         $this->faker->addProvider(new AppProvider());
+        for ($i = 0; $i < 7; $i++) {
+            $user = new User();
+            $user->setUuid(Uuid::v7());
+            $user->setRoles($this->faker->role());
+            $user->setPassword($this->userPasswordHasher->hashPassword($user, $this->faker->password(8, 20)));
+            $user->setFirstname($this->faker->firstName());
+            $user->setSurname($this->faker->lastName());
+            $user->setSlug($this->faker->slug(3, false));
+            $user->setCreatedAt(new \DateTime($this->faker->date()));
+            $user->setUpdatedAt(new \DateTime($this->faker->date()));
 
-        $user = new User();
-        $user->setUuid(Uuid::v7());
-        $user->setRoles($this->faker->role());
-        $user->setPassword($this->userPasswordHasher->hashPassword($user, $this->faker->password(8, 20)));
-        $user->setFirstname($this->faker->firstName());
-        $user->setSurname($this->faker->lastName());
-        $user->setSlug($this->faker->slug(3, false));
-        $user->setCreatedAt(new \DateTime($this->faker->date()));
-        $user->setUpdatedAt(new \DateTime($this->faker->date()));
-
-        $manager->persist($user);
-        $manager->flush();
+            $manager->persist($user);
+            $manager->flush();
+        }
     }
 }
