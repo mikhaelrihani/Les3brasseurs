@@ -1,37 +1,28 @@
 <?php
 
-namespace App\DataFixtures;
+namespace App\DataFixtures\AppFixtures;
 
 use App\DataFixtures\Provider\AppProvider;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\DataFixtures\AppFixtures\CoreFixtures;
 use Doctrine\Persistence\ObjectManager;
-use Faker\Factory;
 use App\Entity\User;
 use App\Entity\UserInfos;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Uid\Uuid;
 
-class UserFixtures extends Fixture
+class UserFixtures extends CoreFixtures
 {
 
-    private $userPasswordHasher;
-    private $faker;
-
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
-    {
-        $this->userPasswordHasher = $userPasswordHasher;
-        $this->faker = Factory::create("fr_FR");
-    }
+    public const UserCount = 22;
     public function load(ObjectManager $manager): void
     {
-
         $this->faker->addProvider(new AppProvider());
 
         //! User 
         $users = [];
-        for ($i = 0; $i < 7; $i++) {
+
+        for ($i = 0; $i < self::UserCount; $i++) {
             $user = new User();
-            $user->setUuid(Uuid::v7());
+            $user->setUuid(Uuid::v4());
             $user->setRoles($this->faker->role());
             $user->setPassword($this->userPasswordHasher->hashPassword($user, $this->faker->password(8, 20)));
             $user->setFirstname($this->faker->firstName());
@@ -42,11 +33,15 @@ class UserFixtures extends Fixture
 
             $users[] = $user;
             $manager->persist($user);
+            $this->addReference("user_" . $i, $user);
 
         }
 
+
+
         //! UserInfos
-        foreach ($users as $user){
+
+        foreach ($users as $user) {
             $userInfos = new UserInfos();
             $userInfos->setUser($user);
             $userInfos->setBusiness($this->faker->business());
@@ -58,9 +53,13 @@ class UserFixtures extends Fixture
             $userInfos->setUpdatedAt(new \DateTime($this->faker->date()));
 
             $manager->persist($userInfos);
-
         }
 
         $manager->flush();
+
+        $this->addReference(self::UserCount, $user);
+
+
+
     }
 }
