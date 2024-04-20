@@ -20,4 +20,22 @@ class AppProvider
     {
         return $this->roles[array_rand($this->roles)];
     }
+
+    private $business = [
+        "3Brasseurs",
+        "FraisImport",
+        "ProAPro",
+        "Runlog",
+        "Victoria",
+        "MartinPecheur",
+        "ArmementDesMascareignes",
+        "SalaisonsdeBourbon"
+    ];
+    /**
+     * returns a random business
+     */
+    public function business()
+    {
+        return $this->business[array_rand($this->business)];
+    }
 }

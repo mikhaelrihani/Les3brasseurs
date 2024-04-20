@@ -7,6 +7,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use App\Entity\User;
+use App\Entity\UserInfos;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -25,6 +26,9 @@ class UserFixtures extends Fixture
     {
 
         $this->faker->addProvider(new AppProvider());
+
+        //! User 
+        $users = [];
         for ($i = 0; $i < 7; $i++) {
             $user = new User();
             $user->setUuid(Uuid::v7());
@@ -36,8 +40,27 @@ class UserFixtures extends Fixture
             $user->setCreatedAt(new \DateTime($this->faker->date()));
             $user->setUpdatedAt(new \DateTime($this->faker->date()));
 
+            $users[] = $user;
             $manager->persist($user);
-            $manager->flush();
+
         }
+
+        //! UserInfos
+        foreach ($users as $user){
+            $userInfos = new UserInfos();
+            $userInfos->setUser($user);
+            $userInfos->setBusiness($this->faker->business());
+            $userInfos->setphone($this->faker->phoneNumber());
+            $userInfos->setWhatsApp($this->faker->phoneNumber());
+            $userInfos->setAvatar($this->faker->imageUrl(640, 480, 'people', true));
+            $userInfos->setEmail($this->faker->email());
+            $userInfos->setCreatedAt(new \DateTime($this->faker->date()));
+            $userInfos->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            $manager->persist($userInfos);
+
+        }
+
+        $manager->flush();
     }
 }
