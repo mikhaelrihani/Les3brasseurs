@@ -6,6 +6,7 @@ use App\DataFixtures\AppFixtures\CoreFixtures;
 use App\Entity\CookingCategory;
 use App\Entity\CookingSheet;
 use App\Entity\Dish;
+use App\Entity\Menu;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
@@ -103,12 +104,54 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
                     $dish->addPicture($selectedPictures);
                     $dishPictures[] = $selectedPictures;
                 }
-                array_splice($pictures,$randomIndex, 1);
+                array_splice($pictures, $randomIndex, 1);
             }
 
             $dishes[] = $dish;
             $manager->persist($dish);
             $this->addReference("dish_" . $i, $dish);
+        }
+
+        //! Menu
+
+        $menus = [];
+
+        // we retrieve the dates from the references to be able to associate them with the inventories
+        $dates = [];
+        $i = 0;
+        while ($this->hasReference("date_" . $i)) {
+            $date = $this->getReference("date_" . $i);
+            $dates[] = $date;
+            $i++;
+        }
+
+        for ($i = 0; $i < 12; $i++) {
+            $menu = new Menu();
+            $menu->setName($this->faker->word());
+            $menu->setSlug($this->faker->text(10));
+            $menu->setEndDateId($dates[array_rand($dates)]);
+            $menu->setStartDateId($dates[array_rand($dates)]);
+            $menu->setWeek($this->faker->numberBetween(1, 52));
+            $menu->setCreatedAt(new \DateTime($this->faker->date()));
+            $menu->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            // A menu can have multiple dishes, but each dish must be unique.
+            $nbDishes = rand(0, 5);
+            $menuDishes = [];
+
+            for ($j = 0; $j <= $nbDishes; $j++) {
+                $randomIndex = array_rand($dishes);
+                $selectedDish = $dishes[$randomIndex];
+
+                if (!in_array($selectedDish, $menuDishes)) {
+                    $menu->addDish($selectedDish);
+                    $menuDishes[] = $selectedDish;
+                }
+            }
+
+            $menus[] = $menu;
+            $manager->persist($menu);
+            $this->addReference("menu_" . $i, $menu);
         }
 
         $manager->flush();

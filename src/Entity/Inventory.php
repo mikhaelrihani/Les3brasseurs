@@ -51,14 +51,14 @@ class Inventory
         return $this;
     }
 
-    public function getDateId(): ?Date
+    public function getDate(): ?Date
     {
         return $this->date;
     }
 
-    public function setDateId(?Date $date_id): static
+    public function setDate(?Date $date): static
     {
-        $this->date = $date_id;
+        $this->date = $date;
 
         return $this;
     }

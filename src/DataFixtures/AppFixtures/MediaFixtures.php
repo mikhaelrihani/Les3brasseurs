@@ -7,6 +7,7 @@ use App\Entity\Date;
 use App\Entity\Email;
 use App\Entity\File;
 use App\Entity\Mime;
+use App\Entity\Notification;
 use App\Entity\Picture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -124,7 +125,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                 }
             }
 
-            // An email can have multiple receivers, but each receiver alias user must be unique.
+            // An email can have multiple receivers, but each receiver "alias user" must be unique.
             $nbReceivers = rand(0, 10);
             $emailReceivers = [];
             if (!empty($users)) {
@@ -143,6 +144,53 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $manager->persist($email);
             $this->addReference("email_" . $i, $email);
         }
+
+        //! Notification
+
+        $notifications = [];
+
+        // we retrieve the groups from the references to be able to associate them with the notifications
+
+        $groups = [];
+        $i = 0;
+
+        while ($this->hasReference("group_" . $i)) {
+            $group = $this->getReference("group_" . $i);
+            $groups[] = $group;
+            $i++;
+        }
+
+        for ($i = 0; $i < 50; $i++) {
+            $notification = new Notification();
+            $notification->setName($this->faker->word(1));
+            $notification->setSlug($this->faker->word(1));
+            $notification->setContent($this->faker->text(1000));
+            $notification->setType($this->faker->word(1));
+            $notification->setComment($this->faker->text(1000));
+            $notification->setCreatedAt(new \DateTime($this->faker->date()));
+            $notification->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            
+            // A notification can be sent to multiple groups , but each group must be unique.
+            $nbGroups = rand(0, 10);
+            $notificationGroups = [];
+            if (!empty($groups)) {
+                for ($j = 0; $j < $nbGroups; $j++) {
+                    $randomIndex = array_rand($groups);
+                    $notificationGroup = $groups[$randomIndex];
+
+                    if (!in_array($notificationGroup, $notificationGroups)) {
+                        $notification->addGroupUser($notificationGroup);
+                        $notificationGroups[] = $notificationGroup;
+                    }
+                }
+            }
+            
+
+            $notifications[] = $notification;
+            $manager->persist($notification);
+        }
+
 
         $manager->flush();
 

@@ -34,8 +34,9 @@ class Notification
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $datetime = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $created_at = null;
+
 
     /**
      * @var Collection<int, group>
@@ -125,14 +126,14 @@ class Notification
         return $this;
     }
 
-    public function getDatetime(): ?string
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->datetime;
+        return $this->created_at;
     }
 
-    public function setDatetime(string $datetime): static
+    public function setCreatedAt(\DateTimeInterface $created_at): static
     {
-        $this->datetime = $datetime;
+        $this->created_at = $created_at;
 
         return $this;
     }
