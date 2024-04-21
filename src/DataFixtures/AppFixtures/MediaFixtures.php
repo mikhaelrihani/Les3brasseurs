@@ -3,6 +3,7 @@
 namespace App\DataFixtures\AppFixtures;
 
 use App\DataFixtures\AppFixtures\CoreFixtures;
+use App\Entity\Date;
 use App\Entity\Mime;
 use App\Entity\Picture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,6 +16,22 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
+        //! date
+
+        $dates = [];
+
+        for ($i = 0; $i < 12; $i++) {
+            $date = new Date();
+            $date->setYear($this->faker->year());
+            $date->setMonth($this->faker->monthName());
+            $date->setDay($this->faker->dayOfMonth());
+            $date->setCreatedAt(new \DateTime($this->faker->date()));
+            $date->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            $dates[] = $date;
+            $manager->persist($date);
+            $this->addReference("date_" . $i, $date);
+        }
 
         //! Mime
 
@@ -27,7 +44,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
             $mimes[] = $mime;
             $manager->persist($mime);
-            
+
         }
 
         //! Picture

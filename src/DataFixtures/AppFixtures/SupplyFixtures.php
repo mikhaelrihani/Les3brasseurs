@@ -3,6 +3,8 @@
 namespace App\DataFixtures\AppFixtures;
 
 use App\DataFixtures\AppFixtures\CoreFixtures;
+use App\Entity\Order;
+use App\Entity\OrdersProducts;
 use App\Entity\Product;
 use App\Entity\Supplier;
 use App\Entity\SupplyType;
@@ -76,14 +78,14 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
             for ($j = 0; $j < $randomCount; $j++) {
 
-                $randomIndex = rand(0, count($pictures)-1);
+                $randomIndex = rand(0, count($pictures) - 1);
                 $picture = $pictures[$randomIndex];
 
                 if (!in_array($picture, $productPictures)) {
                     $productPictures[] = $picture;
                     $product->addPicture($picture);
                 }
-            // remove the picture from the pictures array to avoid adding it to another product
+                // remove the picture from the pictures array to avoid adding it to another product
                 array_splice($pictures, $randomIndex, 1);
 
                 if (count($productPictures) == 5) {
@@ -96,7 +98,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
             $randomCount = rand(1, count($rooms));
             $roomProducts = [];
 
-            for ($j = 0; $j < $randomCount; $j++) {
+            for ($k = 0; $k < $randomCount; $k++) {
 
                 $randomIndex = rand(0, count($rooms) - 1);
                 $room = $rooms[$randomIndex];
@@ -159,6 +161,63 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
             $manager->persist($supplier);
         }
 
+        //! Order
+
+        $orders = [];
+
+        // we retrieve the dates from the references to be able to associate them with the orders
+        $dates = [];
+        $i = 0;
+
+        while ($this->hasReference("date_" . $i)) {
+            $date = $this->getReference("date_" . $i);
+            $dates[] = $date;
+            $i++;
+        }
+
+        for ($i = 0; $i < 50; $i++) {
+            $order = new Order();
+            $order->setSupplier($suppliers[array_rand($suppliers)]);
+            $order->setDate($dates[array_rand($dates)]);
+            $order->setSlug($this->faker->slug(3, false));
+            $order->setName($this->faker->word());
+            $order->setCreatedAt(new \DateTime($this->faker->date()));
+            $order->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            $orders[] = $order;
+            $manager->persist($order);
+        }
+
+        //! OrdersProducts
+
+        foreach ($orders as $order) {
+            // Nombre aléatoire de produits pour cette commande
+            $numberOfProducts = rand(1, 5); // Par exemple, une commande peut contenir de 1 à 5 produits
+
+            // Créer un tableau pour stocker les produits déjà ajoutés à cette commande
+            $addedProducts = [];
+
+            // Ajouter des produits à la commande jusqu'à ce que le nombre spécifié soit atteint
+            for ($i = 0; $i < $numberOfProducts; $i++) {
+                // Sélectionner un produit aléatoire
+                $product = $products[array_rand($products)];
+
+                // Vérifier si le produit a déjà été ajouté à cette commande
+                if (!in_array($product, $addedProducts)) {
+                    // Créer une relation entre la commande et le produit
+                    $orderProduct = new OrdersProducts();
+                    $orderProduct->setOrders($order);
+                    $orderProduct->setProduct($product);
+                    $orderProduct->setQuantity(rand(1, 100)); // Quantité aléatoire par produit
+                    $orderProduct->setCreatedAt(new \DateTime($this->faker->date()));
+                    $orderProduct->setUpdatedAt(new \DateTime($this->faker->date()));
+
+                    // Ajouter le produit à la commande et le marquer comme ajouté
+                    $manager->persist($orderProduct);
+                    $addedProducts[] = $product;
+                }
+            }
+        }
 
 
         $manager->flush();
