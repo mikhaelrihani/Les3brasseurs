@@ -16,6 +16,8 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
+
+
         //! SupplyType
 
         $supplytypes = [];
@@ -31,6 +33,27 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
         //! Product
 
+        // we retrieve the pictures from the references to be able to associate them with the products
+        $pictures = [];
+        $i = 0;
+
+        while ($this->hasReference("picture_" . $i)) {
+            $picture = $this->getReference("picture_" . $i);
+            $pictures[] = $picture;
+            $i++;
+        }
+
+        // we retrieve the rooms from the references to be able to associate them with the products
+        $rooms = [];
+        $i = 0;
+
+        while ($this->hasReference("room_" . $i)) {
+            $room = $this->getReference("room_" . $i);
+            $rooms[] = $room;
+            $i++;
+        }
+
+
         $products = [];
 
         for ($i = 0; $i < 50; $i++) {
@@ -44,6 +67,46 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
             $product->setCreatedAt(new \DateTime($this->faker->date()));
             $product->setUpdatedAt(new \DateTime($this->faker->date()));
 
+
+
+            // add random number ( max 5) of unique picture to each product 
+
+            $randomCount = rand(1, min(5, count($pictures)));
+            $productPictures = [];
+
+            for ($j = 0; $j < $randomCount; $j++) {
+
+                $randomIndex = rand(0, count($pictures)-1);
+                $picture = $pictures[$randomIndex];
+
+                if (!in_array($picture, $productPictures)) {
+                    $productPictures[] = $picture;
+                    $product->addPicture($picture);
+                }
+            // remove the picture from the pictures array to avoid adding it to another product
+                array_splice($pictures, $randomIndex, 1);
+
+                if (count($productPictures) == 5) {
+                    break;
+                }
+
+            }
+
+            // add a random number of unique room to roomProducts array 
+            $randomCount = rand(1, count($rooms));
+            $roomProducts = [];
+
+            for ($j = 0; $j < $randomCount; $j++) {
+
+                $randomIndex = rand(0, count($rooms) - 1);
+                $room = $rooms[$randomIndex];
+
+                if (!in_array($room, $roomProducts)) {
+                    $roomProducts[] = $room;
+                    $product->addRoom($room);
+                }
+            }
+
             $products[] = $product;
             $manager->persist($product);
         }
@@ -52,14 +115,19 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
         //! Supplier
 
         $suppliers = [];
-        $staffIndices = range(0, UserFixtures::UserCount -1);
+        $staffIndices = range(0, UserFixtures::UserCount - 1);
         $maxSupplierCount = floor(UserFixtures::UserCount / 4);
-        $productIndices = range(0, count($products) - 1);
+
 
         // Boucle pour créer les fournisseurs
         for ($i = 0; $i < $maxSupplierCount; $i++) {
             $supplier = new Supplier();
             $supplier->setName($this->faker->company());
+            $supplier->setDescription($this->faker->text(200));
+            $supplier->setComments($this->faker->text(200));
+            $supplier->setSlug($this->faker->slug(3, false));
+            $supplier->setCreatedAt(new \DateTime($this->faker->date()));
+            $supplier->setUpdatedAt(new \DateTime($this->faker->date()));
 
             // Ajouter jusqu'à 3 employés
             for ($k = 0; $k < rand(1, 4); $k++) {
@@ -71,22 +139,21 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
                 }
             }
 
-            // Ajouter jusqu'à 5 produits
-            for ($j = 0; $j < min(5, count($productIndices)); $j++) {
-                $randomProductIndex = array_rand($productIndices);
-                $productIndex = $productIndices[$randomProductIndex];
-                if (isset($productIndex)) {
-                    $supplier->addProduct($products[$productIndex]);
-                    unset($productIndices[$randomProductIndex]);
+            // add a random number of unique products to supplierProducts array 
+            $randomCount = rand(0, count($products));
+            $supplierProducts = [];
+
+            for ($j = 0; $j < $randomCount; $j++) {
+
+                $randomIndex = rand(0, count($products) - 1);
+                $product = $products[$randomIndex];
+
+                if (!in_array($product, $supplierProducts)) {
+                    $supplierProducts[] = $product;
+                    $supplier->addProduct($product);
                 }
             }
 
-
-            $supplier->setDescription($this->faker->text(200));
-            $supplier->setComments($this->faker->text(200));
-            $supplier->setSlug($this->faker->slug(3, false));
-            $supplier->setCreatedAt(new \DateTime($this->faker->date()));
-            $supplier->setUpdatedAt(new \DateTime($this->faker->date()));
 
             $suppliers[] = $supplier;
             $manager->persist($supplier);
@@ -97,10 +164,12 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
         $manager->flush();
 
     }
+
     public function getDependencies()
     {
         return [
             UserFixtures::class,
+            InventoryFixtures::class,
         ];
     }
 }
