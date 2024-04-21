@@ -101,12 +101,12 @@ class File
         return $this;
     }
 
-    public function getMimeId(): ?mime
+    public function getMime(): ?mime
     {
         return $this->mime;
     }
 
-    public function setMimeId(?mime $mime): static
+    public function setMime(?mime $mime): static
     {
         $this->mime = $mime;
 

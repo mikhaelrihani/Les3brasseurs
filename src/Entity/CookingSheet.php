@@ -24,7 +24,7 @@ class CookingSheet
 
     #[ORM\ManyToOne(inversedBy: 'cookingSheets')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?cookingCategory $cookingCategories_id = null;
+    private ?cookingCategory $cookingCategories = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
@@ -72,14 +72,15 @@ class CookingSheet
         return $this;
     }
 
-    public function getCookingCategoriesId(): ?cookingCategory
+    public function getCookingCategories(): ?cookingCategory
     {
-        return $this->cookingCategories_id;
+        return $this->cookingCategories;
     }
 
-    public function setCookingCategoriesId(?cookingCategory $cookingCategories_id): static
+    public function setCookingCategories(?cookingCategory $cookingCategories_id): static
     {
-        $this->cookingCategories_id = $cookingCategories_id;
+        $this->cookingCategories
+         = $cookingCategories_id;
 
         return $this;
     }

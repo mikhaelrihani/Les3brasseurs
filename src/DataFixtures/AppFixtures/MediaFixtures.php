@@ -4,6 +4,7 @@ namespace App\DataFixtures\AppFixtures;
 
 use App\DataFixtures\AppFixtures\CoreFixtures;
 use App\Entity\Date;
+use App\Entity\File;
 use App\Entity\Mime;
 use App\Entity\Picture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -64,7 +65,22 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $this->addReference("picture_" . $i, $picture);
         }
 
+        //! File
 
+        $files = [];
+        for ($i = 0; $i < 100; $i++) {
+            $file = new File();
+            $file->setName($this->faker->word());
+            $file->setDocType($this->faker->word());
+            $file->setPath($this->faker->imageUrl());
+            $file->setMime($mimes[array_rand($mimes)]);
+            $file->setCreatedAt(new \DateTime($this->faker->date()));
+            $file->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            $files[] = $file;
+            $manager->persist($file);
+            $this->addReference("file_" . $i, $file);
+        }
 
         $manager->flush();
 

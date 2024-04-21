@@ -52,11 +52,18 @@ class Dish
     #[ORM\ManyToMany(targetEntity: picture::class)]
     private Collection $pictures;
 
+    /**
+     * @var Collection<int, cookingSheet>
+     */
+    #[ORM\ManyToMany(targetEntity: cookingSheet::class)]
+    private Collection $cookingSheet;
+
     
     public function __construct()
     {
         $this->menus = new ArrayCollection();
         $this->pictures = new ArrayCollection();
+        $this->cookingSheet = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,6 +214,30 @@ class Dish
     public function removePicture(picture $picture): static
     {
         $this->pictures->removeElement($picture);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, cookingSheet>
+     */
+    public function getCookingSheet(): Collection
+    {
+        return $this->cookingSheet;
+    }
+
+    public function addCookingSheet(cookingSheet $cookingSheet): static
+    {
+        if (!$this->cookingSheet->contains($cookingSheet)) {
+            $this->cookingSheet->add($cookingSheet);
+        }
+
+        return $this;
+    }
+
+    public function removeCookingSheet(cookingSheet $cookingSheet): static
+    {
+        $this->cookingSheet->removeElement($cookingSheet);
 
         return $this;
     }

@@ -28,7 +28,7 @@ class CookingCategory
     /**
      * @var Collection<int, CookingSheet>
      */
-    #[ORM\OneToMany(targetEntity: CookingSheet::class, mappedBy: 'cookingCategories_id')]
+    #[ORM\OneToMany(targetEntity: CookingSheet::class, mappedBy: 'cookingCategories')]
     private Collection $cookingSheets;
 
     public function __construct()
@@ -89,7 +89,7 @@ class CookingCategory
     {
         if (!$this->cookingSheets->contains($cookingSheet)) {
             $this->cookingSheets->add($cookingSheet);
-            $cookingSheet->setCookingCategoriesId($this);
+            $cookingSheet->setCookingCategories($this);
         }
 
         return $this;
@@ -99,8 +99,8 @@ class CookingCategory
     {
         if ($this->cookingSheets->removeElement($cookingSheet)) {
             // set the owning side to null (unless already changed)
-            if ($cookingSheet->getCookingCategoriesId() === $this) {
-                $cookingSheet->setCookingCategoriesId(null);
+            if ($cookingSheet->getCookingCategories() === $this) {
+                $cookingSheet->setCookingCategories(null);
             }
         }
 

@@ -4,6 +4,8 @@ namespace App\DataFixtures\AppFixtures;
 
 use App\DataFixtures\Provider\AppProvider;
 use App\DataFixtures\AppFixtures\CoreFixtures;
+use App\Entity\Group;
+use App\Entity\Job;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\User;
 use App\Entity\UserInfos;
@@ -55,11 +57,39 @@ class UserFixtures extends CoreFixtures
             $manager->persist($userInfos);
         }
 
-        $manager->flush();
+
+
+        //! Groups
+
+        $groups = [];
+        for ($i = 0; $i < 12; $i++) {
+            $group = new Group();
+            $group->setName($this->faker->word());
+            $group->setCreatedAt(new \DateTime($this->faker->date()));
+            $group->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            $groups[] = $group;
+            $manager->persist($group);
+            $this->addReference("group_" . $i, $group);
+        }
+
+        //! Job
+
+        $jobs = [];
+
+        for ($i = 0; $i < 12; $i++) {
+            $job = new Job();
+            $job->setName($this->faker->word());
+            $job->setCreatedAt(new \DateTime($this->faker->date()));
+            $job->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            $jobs[] = $job;
+            $manager->persist($job);
+            $this->addReference("job_" . $i, $job);
+        }
 
         $this->addReference(self::UserCount, $user);
-
-
+        $manager->flush();
 
     }
 }
