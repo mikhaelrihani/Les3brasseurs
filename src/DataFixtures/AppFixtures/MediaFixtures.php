@@ -4,6 +4,7 @@ namespace App\DataFixtures\AppFixtures;
 
 use App\DataFixtures\AppFixtures\CoreFixtures;
 use App\Entity\Date;
+use App\Entity\Email;
 use App\Entity\File;
 use App\Entity\Mime;
 use App\Entity\Picture;
@@ -80,6 +81,67 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $files[] = $file;
             $manager->persist($file);
             $this->addReference("file_" . $i, $file);
+        }
+
+        //! Email
+
+        $emails = [];
+
+        // we retrieve the users from the references to be able to associate them with the emails
+
+        $users = [];
+        $i = 0;
+
+        while ($this->hasReference("user_" . $i)) {
+            $user = $this->getReference("user_" . $i);
+            $users[] = $user;
+            $i++;
+        }
+
+        for ($i = 0; $i < 12; $i++) {
+            $email = new Email();
+            $email->setObject($this->faker->sentence());
+            $email->setContent($this->faker->text(1000));
+            $email->setStatus($this->faker->word());
+            $email->setSender($users[array_rand($users)]);
+            $email->setDate($dates[array_rand($dates)]);
+            $email->setDelivered($this->faker->boolean());
+            $email->setCreatedAt(new \DateTime($this->faker->date()));
+            $email->setUpdatedAt(new \DateTime($this->faker->date()));
+
+            // An email can have multiple files, but each file must be unique.
+            $nbFiles = rand(0, 4);
+            $emailFiles = [];
+            if (!empty($files)) {
+                for ($j = 0; $j < $nbFiles; $j++) {
+                    $randomIndex = array_rand($files);
+                    $selectedFiles = $files[$randomIndex];
+
+                    if (!in_array($selectedFiles, $emailFiles)) {
+                        $email->addFile($selectedFiles);
+                        $emailFiles[] = $selectedFiles;
+                    }
+                }
+            }
+
+            // An email can have multiple receivers, but each receiver alias user must be unique.
+            $nbReceivers = rand(0, 10);
+            $emailReceivers = [];
+            if (!empty($users)) {
+                for ($j = 0; $j < $nbReceivers; $j++) {
+                    $randomIndex = array_rand($users);
+                    $selectedReceivers = $users[$randomIndex];
+
+                    if (!in_array($selectedReceivers, $emailReceivers)) {
+                        $email->addReceiver($selectedReceivers);
+                        $emailReceivers[] = $selectedReceivers;
+                    }
+                }
+            }
+
+            $emails[] = $email;
+            $manager->persist($email);
+            $this->addReference("email_" . $i, $email);
         }
 
         $manager->flush();

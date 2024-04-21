@@ -30,7 +30,7 @@ class Email
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?date $date_id = null;
+    private ?date $date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
@@ -113,14 +113,14 @@ class Email
         return $this;
     }
 
-    public function getDateId(): ?date
+    public function getDate(): ?date
     {
-        return $this->date_id;
+        return $this->date;
     }
 
-    public function setDateId(?date $date_id): static
+    public function setDate(?date $date): static
     {
-        $this->date_id = $date_id;
+        $this->date = $date;
 
         return $this;
     }
