@@ -3,12 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\UserInfosRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserInfosRepository::class)]
+#[UniqueEntity('email')]
+#[UniqueEntity('phone')]
+#[UniqueEntity('whatsApp')]
 class UserInfos
 {
     #[ORM\Id]
@@ -17,9 +20,11 @@ class UserInfos
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $business = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
@@ -39,6 +44,10 @@ class UserInfos
     private ?user $user = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Email(
+        message: 'The email {{ value }} is not a valid email.',
+    )]
+    #[Assert\NotBlank]
     private ?string $email = null;
 
 

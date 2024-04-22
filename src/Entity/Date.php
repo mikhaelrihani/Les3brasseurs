@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DateRepository::class)]
 class Date
@@ -17,12 +18,15 @@ class Date
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?int $year = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $month = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?int $day = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
