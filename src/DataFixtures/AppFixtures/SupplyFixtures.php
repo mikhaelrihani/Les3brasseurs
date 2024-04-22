@@ -155,8 +155,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
                     $supplier->addProduct($product);
                 }
             }
-
-
+            
             $suppliers[] = $supplier;
             $manager->persist($supplier);
         }

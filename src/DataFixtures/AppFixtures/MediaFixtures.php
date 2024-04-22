@@ -52,7 +52,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
         //! Picture
 
-        $pictures = [];
+        
         for ($i = 0; $i < 300; $i++) {
             $picture = new Picture();
             $picture->setName($this->faker->word());
@@ -62,7 +62,6 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $picture->setCreatedAt(new \DateTime($this->faker->date()));
             $picture->setUpdatedAt(new \DateTime($this->faker->date()));
 
-            $pictures[] = $picture;
             $manager->persist($picture);
             $this->addReference("picture_" . $i, $picture);
         }
@@ -81,12 +80,9 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
             $files[] = $file;
             $manager->persist($file);
-            $this->addReference("file_" . $i, $file);
         }
 
         //! Email
-
-        $emails = [];
 
         // we retrieve the users from the references to be able to associate them with the emails
 
@@ -139,15 +135,10 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                     }
                 }
             }
-
-            $emails[] = $email;
             $manager->persist($email);
-            $this->addReference("email_" . $i, $email);
         }
 
         //! Notification
-
-        $notifications = [];
 
         // we retrieve the groups from the references to be able to associate them with the notifications
 
@@ -186,8 +177,6 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                 }
             }
             
-
-            $notifications[] = $notification;
             $manager->persist($notification);
         }
 

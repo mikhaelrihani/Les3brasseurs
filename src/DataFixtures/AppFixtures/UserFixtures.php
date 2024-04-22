@@ -39,8 +39,6 @@ class UserFixtures extends CoreFixtures
 
         }
 
-
-
         //! UserInfos
 
         foreach ($users as $user) {
@@ -57,25 +55,19 @@ class UserFixtures extends CoreFixtures
             $manager->persist($userInfos);
         }
 
-
-
         //! Groups
 
-        $groups = [];
         for ($i = 0; $i < 12; $i++) {
             $group = new Group();
             $group->setName($this->faker->word());
             $group->setCreatedAt(new \DateTime($this->faker->date()));
             $group->setUpdatedAt(new \DateTime($this->faker->date()));
 
-            $groups[] = $group;
             $manager->persist($group);
             $this->addReference("group_" . $i, $group);
         }
 
         //! Job
-
-        $jobs = [];
 
         for ($i = 0; $i < 12; $i++) {
             $job = new Job();
@@ -83,9 +75,7 @@ class UserFixtures extends CoreFixtures
             $job->setCreatedAt(new \DateTime($this->faker->date()));
             $job->setUpdatedAt(new \DateTime($this->faker->date()));
 
-            $jobs[] = $job;
             $manager->persist($job);
-            $this->addReference("job_" . $i, $job);
         }
 
         $this->addReference(self::UserCount, $user);

@@ -24,12 +24,9 @@ class InventoryFixtures extends CoreFixtures implements DependentFixtureInterfac
 
             $rooms[] = $room;
             $manager->persist($room);
-            $this->addReference("room_" . $i, $room);
         }
 
         //! Inventory
-
-        $inventories = [];
 
         // we retrieve the dates from the references to be able to associate them with the inventories
         $dates = [];
@@ -49,9 +46,7 @@ class InventoryFixtures extends CoreFixtures implements DependentFixtureInterfac
             $inventory->setCreatedAt(new \DateTime($this->faker->date()));
             $inventory->setUpdatedAt(new \DateTime($this->faker->date()));
 
-            $inventories[] = $inventory;
             $manager->persist($inventory);
-            $this->addReference("inventory_" . $i, $inventory);
         }
 
         $manager->flush();
