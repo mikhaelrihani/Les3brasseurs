@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240419130724 extends AbstractMigration
+final class Version20240422132501 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -22,21 +22,22 @@ final class Version20240419130724 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE `Group` (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE cooking_category (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE cooking_sheet (id INT AUTO_INCREMENT NOT NULL, cooking_categories_id_id INT NOT NULL, name VARCHAR(255) NOT NULL, slug VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_CBD6B5D2C4B1BF7B (cooking_categories_id_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE cooking_sheet (id INT AUTO_INCREMENT NOT NULL, cooking_categories_id INT NOT NULL, name VARCHAR(255) NOT NULL, slug VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_CBD6B5D236F1D7E9 (cooking_categories_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE cooking_sheet_picture (cooking_sheet_id INT NOT NULL, picture_id INT NOT NULL, INDEX IDX_E44996A1E4E09B9 (cooking_sheet_id), INDEX IDX_E44996AEE45BDBF (picture_id), PRIMARY KEY(cooking_sheet_id, picture_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE date (id INT AUTO_INCREMENT NOT NULL, year INT NOT NULL, month VARCHAR(255) NOT NULL, day INT NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE dish (id INT AUTO_INCREMENT NOT NULL, slug VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(1000) NOT NULL, comment VARCHAR(1000) NOT NULL, help_url VARCHAR(255) NOT NULL, help_text VARCHAR(1000) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE dish_picture (dish_id INT NOT NULL, picture_id INT NOT NULL, INDEX IDX_866C551F148EB0CB (dish_id), INDEX IDX_866C551FEE45BDBF (picture_id), PRIMARY KEY(dish_id, picture_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE email (id INT AUTO_INCREMENT NOT NULL, date_id_id INT NOT NULL, sender_id INT NOT NULL, object VARCHAR(255) NOT NULL, content LONGTEXT DEFAULT NULL, status VARCHAR(255) NOT NULL, delivered TINYINT(1) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_E7927C74C5B476DB (date_id_id), INDEX IDX_E7927C74F624B39D (sender_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE dish_cooking_sheet (dish_id INT NOT NULL, cooking_sheet_id INT NOT NULL, INDEX IDX_570F017C148EB0CB (dish_id), INDEX IDX_570F017C1E4E09B9 (cooking_sheet_id), PRIMARY KEY(dish_id, cooking_sheet_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE email (id INT AUTO_INCREMENT NOT NULL, date_id INT NOT NULL, sender_id INT NOT NULL, object VARCHAR(255) NOT NULL, content LONGTEXT DEFAULT NULL, status VARCHAR(255) NOT NULL, delivered TINYINT(1) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_E7927C74B897366B (date_id), INDEX IDX_E7927C74F624B39D (sender_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE email_user (email_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_12A5F6CCA832C1C9 (email_id), INDEX IDX_12A5F6CCA76ED395 (user_id), PRIMARY KEY(email_id, user_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE email_file (email_id INT NOT NULL, file_id INT NOT NULL, INDEX IDX_13A91695A832C1C9 (email_id), INDEX IDX_13A9169593CB796C (file_id), PRIMARY KEY(email_id, file_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE file (id INT AUTO_INCREMENT NOT NULL, mime_id INT NOT NULL, name VARCHAR(255) NOT NULL, doc_type VARCHAR(255) NOT NULL, path VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_8C9F3610ACAC0426 (mime_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE inventory (id INT AUTO_INCREMENT NOT NULL, date_id INT NOT NULL, room_id INT NOT NULL, slug VARCHAR(255) NOT NULL, status VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_B12D4A36B897366B (date_id), INDEX IDX_B12D4A3654177093 (room_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE job (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE menu (id INT AUTO_INCREMENT NOT NULL, start_date_id_id INT NOT NULL, end_date_id_id INT NOT NULL, slug VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, week INT NOT NULL, updated_at DATETIME NOT NULL, datetime VARCHAR(255) NOT NULL, INDEX IDX_7D053A93B77BD925 (start_date_id_id), INDEX IDX_7D053A93CBFC2E55 (end_date_id_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE menu (id INT AUTO_INCREMENT NOT NULL, start_date_id_id INT NOT NULL, end_date_id_id INT NOT NULL, slug VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, week INT NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_7D053A93B77BD925 (start_date_id_id), INDEX IDX_7D053A93CBFC2E55 (end_date_id_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE menu_dish (menu_id INT NOT NULL, dish_id INT NOT NULL, INDEX IDX_5D327CF6CCD7E912 (menu_id), INDEX IDX_5D327CF6148EB0CB (dish_id), PRIMARY KEY(menu_id, dish_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE mime (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE notification (id INT AUTO_INCREMENT NOT NULL, slug VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, content LONGTEXT NOT NULL, type VARCHAR(255) NOT NULL, comment LONGTEXT NOT NULL, updated_at DATETIME NOT NULL, datetime VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE notification (id INT AUTO_INCREMENT NOT NULL, slug VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, content LONGTEXT NOT NULL, type VARCHAR(255) NOT NULL, comment LONGTEXT NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE notification_group (notification_id INT NOT NULL, group_id INT NOT NULL, INDEX IDX_AB74A13CEF1A9D84 (notification_id), INDEX IDX_AB74A13CFE54D947 (group_id), PRIMARY KEY(notification_id, group_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE `order` (id INT AUTO_INCREMENT NOT NULL, supplier_id INT NOT NULL, date_id INT NOT NULL, slug VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_F52993982ADD6D8C (supplier_id), INDEX IDX_F5299398B897366B (date_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE orders_products (id INT AUTO_INCREMENT NOT NULL, orders_id INT NOT NULL, product_id INT NOT NULL, quantity INT NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_749C879CCFFE9AD6 (orders_id), INDEX IDX_749C879C4584665A (product_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -49,15 +50,17 @@ final class Version20240419130724 extends AbstractMigration
         $this->addSql('CREATE TABLE supplier (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, slug VARCHAR(255) NOT NULL, description LONGTEXT NOT NULL, comments LONGTEXT NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE supplier_user (supplier_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_40CB20A02ADD6D8C (supplier_id), INDEX IDX_40CB20A0A76ED395 (user_id), PRIMARY KEY(supplier_id, user_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE supply_type (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, uuid VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, slug VARCHAR(255) NOT NULL, firstname VARCHAR(255) NOT NULL, surname VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, UNIQUE INDEX UNIQ_IDENTIFIER_UUID (uuid), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, uuid BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid)\', roles JSON NOT NULL, password VARCHAR(255) NOT NULL, slug VARCHAR(255) NOT NULL, firstname VARCHAR(255) NOT NULL, surname VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, UNIQUE INDEX UNIQ_IDENTIFIER_UUID (uuid), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user_infos (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, business VARCHAR(255) NOT NULL, phone VARCHAR(255) NOT NULL, whats_app VARCHAR(255) NOT NULL, avatar VARCHAR(255) NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, email VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_C087935A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE users_user_infos (id INT AUTO_INCREMENT NOT NULL, user_id_id INT NOT NULL, user_infos_id_id INT NOT NULL, UNIQUE INDEX UNIQ_DB63D6A19D86650F (user_id_id), UNIQUE INDEX UNIQ_DB63D6A199A7B7E0 (user_infos_id_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE cooking_sheet ADD CONSTRAINT FK_CBD6B5D2C4B1BF7B FOREIGN KEY (cooking_categories_id_id) REFERENCES cooking_category (id)');
+        $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', available_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', delivered_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_75EA56E0FB7336F0 (queue_name), INDEX IDX_75EA56E0E3BD61CE (available_at), INDEX IDX_75EA56E016BA31DB (delivered_at), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE cooking_sheet ADD CONSTRAINT FK_CBD6B5D236F1D7E9 FOREIGN KEY (cooking_categories_id) REFERENCES cooking_category (id)');
         $this->addSql('ALTER TABLE cooking_sheet_picture ADD CONSTRAINT FK_E44996A1E4E09B9 FOREIGN KEY (cooking_sheet_id) REFERENCES cooking_sheet (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE cooking_sheet_picture ADD CONSTRAINT FK_E44996AEE45BDBF FOREIGN KEY (picture_id) REFERENCES picture (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE dish_picture ADD CONSTRAINT FK_866C551F148EB0CB FOREIGN KEY (dish_id) REFERENCES dish (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE dish_picture ADD CONSTRAINT FK_866C551FEE45BDBF FOREIGN KEY (picture_id) REFERENCES picture (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE email ADD CONSTRAINT FK_E7927C74C5B476DB FOREIGN KEY (date_id_id) REFERENCES date (id)');
+        $this->addSql('ALTER TABLE dish_cooking_sheet ADD CONSTRAINT FK_570F017C148EB0CB FOREIGN KEY (dish_id) REFERENCES dish (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE dish_cooking_sheet ADD CONSTRAINT FK_570F017C1E4E09B9 FOREIGN KEY (cooking_sheet_id) REFERENCES cooking_sheet (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE email ADD CONSTRAINT FK_E7927C74B897366B FOREIGN KEY (date_id) REFERENCES date (id)');
         $this->addSql('ALTER TABLE email ADD CONSTRAINT FK_E7927C74F624B39D FOREIGN KEY (sender_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE email_user ADD CONSTRAINT FK_12A5F6CCA832C1C9 FOREIGN KEY (email_id) REFERENCES email (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE email_user ADD CONSTRAINT FK_12A5F6CCA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
@@ -87,23 +90,19 @@ final class Version20240419130724 extends AbstractMigration
         $this->addSql('ALTER TABLE supplier_user ADD CONSTRAINT FK_40CB20A02ADD6D8C FOREIGN KEY (supplier_id) REFERENCES supplier (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE supplier_user ADD CONSTRAINT FK_40CB20A0A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE user_infos ADD CONSTRAINT FK_C087935A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE users_user_infos ADD CONSTRAINT FK_DB63D6A19D86650F FOREIGN KEY (user_id_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE users_user_infos ADD CONSTRAINT FK_DB63D6A199A7B7E0 FOREIGN KEY (user_infos_id_id) REFERENCES user_infos (id)');
-        $this->addSql('DROP TABLE dates');
-        $this->addSql('DROP TABLE inventories');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE dates (id INT AUTO_INCREMENT NOT NULL, year INT NOT NULL, month VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, day INT NOT NULL, updated_at DATETIME NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
-        $this->addSql('CREATE TABLE inventories (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
-        $this->addSql('ALTER TABLE cooking_sheet DROP FOREIGN KEY FK_CBD6B5D2C4B1BF7B');
+        $this->addSql('ALTER TABLE cooking_sheet DROP FOREIGN KEY FK_CBD6B5D236F1D7E9');
         $this->addSql('ALTER TABLE cooking_sheet_picture DROP FOREIGN KEY FK_E44996A1E4E09B9');
         $this->addSql('ALTER TABLE cooking_sheet_picture DROP FOREIGN KEY FK_E44996AEE45BDBF');
         $this->addSql('ALTER TABLE dish_picture DROP FOREIGN KEY FK_866C551F148EB0CB');
         $this->addSql('ALTER TABLE dish_picture DROP FOREIGN KEY FK_866C551FEE45BDBF');
-        $this->addSql('ALTER TABLE email DROP FOREIGN KEY FK_E7927C74C5B476DB');
+        $this->addSql('ALTER TABLE dish_cooking_sheet DROP FOREIGN KEY FK_570F017C148EB0CB');
+        $this->addSql('ALTER TABLE dish_cooking_sheet DROP FOREIGN KEY FK_570F017C1E4E09B9');
+        $this->addSql('ALTER TABLE email DROP FOREIGN KEY FK_E7927C74B897366B');
         $this->addSql('ALTER TABLE email DROP FOREIGN KEY FK_E7927C74F624B39D');
         $this->addSql('ALTER TABLE email_user DROP FOREIGN KEY FK_12A5F6CCA832C1C9');
         $this->addSql('ALTER TABLE email_user DROP FOREIGN KEY FK_12A5F6CCA76ED395');
@@ -133,8 +132,6 @@ final class Version20240419130724 extends AbstractMigration
         $this->addSql('ALTER TABLE supplier_user DROP FOREIGN KEY FK_40CB20A02ADD6D8C');
         $this->addSql('ALTER TABLE supplier_user DROP FOREIGN KEY FK_40CB20A0A76ED395');
         $this->addSql('ALTER TABLE user_infos DROP FOREIGN KEY FK_C087935A76ED395');
-        $this->addSql('ALTER TABLE users_user_infos DROP FOREIGN KEY FK_DB63D6A19D86650F');
-        $this->addSql('ALTER TABLE users_user_infos DROP FOREIGN KEY FK_DB63D6A199A7B7E0');
         $this->addSql('DROP TABLE `Group`');
         $this->addSql('DROP TABLE cooking_category');
         $this->addSql('DROP TABLE cooking_sheet');
@@ -142,6 +139,7 @@ final class Version20240419130724 extends AbstractMigration
         $this->addSql('DROP TABLE date');
         $this->addSql('DROP TABLE dish');
         $this->addSql('DROP TABLE dish_picture');
+        $this->addSql('DROP TABLE dish_cooking_sheet');
         $this->addSql('DROP TABLE email');
         $this->addSql('DROP TABLE email_user');
         $this->addSql('DROP TABLE email_file');
@@ -166,6 +164,6 @@ final class Version20240419130724 extends AbstractMigration
         $this->addSql('DROP TABLE supply_type');
         $this->addSql('DROP TABLE user');
         $this->addSql('DROP TABLE user_infos');
-        $this->addSql('DROP TABLE users_user_infos');
+        $this->addSql('DROP TABLE messenger_messages');
     }
 }

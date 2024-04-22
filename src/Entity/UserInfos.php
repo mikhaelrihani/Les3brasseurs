@@ -5,7 +5,9 @@ namespace App\Entity;
 use App\Repository\UserInfosRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserInfosRepository::class)]
@@ -17,20 +19,25 @@ class UserInfos
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+ 
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    
     private ?string $business = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+   
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
+   
     private ?string $whatsApp = null;
 
     #[ORM\Column(length: 255)]
+   
     private ?string $avatar = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -39,15 +46,16 @@ class UserInfos
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\OneToOne(inversedBy: 'userInfos', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?user $user = null;
+    #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
+    private ?User $user = null;
+
 
     #[ORM\Column(length: 255)]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     #[Assert\NotBlank]
+   
     private ?string $email = null;
 
 

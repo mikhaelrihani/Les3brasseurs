@@ -38,6 +38,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function findAllUsersWithoutRelation()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userInfos', 'ui') // Exclure la relation userInfos
+            ->getQuery()
+            ->getResult();
+    }
+
+    #
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

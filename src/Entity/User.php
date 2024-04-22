@@ -19,16 +19,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+   
     private ?int $id = null;
 
     #[ORM\Column(type: UuidType::NAME)]
+    
     private Uuid $uuid;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(['group1', 'group2'])]
     private array $roles = [];
 
     /**
@@ -39,14 +40,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+   
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+   
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -55,8 +59,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    private ?UserInfos $userInfos = null;
+    // #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+   
+    // private ?UserInfos $userInfos = null;
 
     public function getId(): ?int
     {
@@ -193,21 +198,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUserInfos(): ?UserInfos
-    {
-        return $this->userInfos;
-    }
+    // public function getUserInfos(): ?UserInfos
+    // {
+    //     return $this->userInfos;
+    // }
 
-    public function setUserInfos(UserInfos $userInfos): static
-    {
-        // set the owning side of the relation if necessary
-        if ($userInfos->getUser() !== $this) {
-            $userInfos->setUser($this);
-        }
+    // public function setUserInfos(UserInfos $userInfos): static
+    // {
+    //     // set the owning side of the relation if necessary
+    //     if ($userInfos->getUser() !== $this) {
+    //         $userInfos->setUser($this);
+    //     }
 
-        $this->userInfos = $userInfos;
+    //     $this->userInfos = $userInfos;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
 }

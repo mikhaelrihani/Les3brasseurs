@@ -37,11 +37,8 @@ class UserFixtures extends CoreFixtures
             $manager->persist($user);
             $this->addReference("user_" . $i, $user);
 
-        }
-
         //! UserInfos
-
-        foreach ($users as $user) {
+        
             $userInfos = new UserInfos();
             $userInfos->setUser($user);
             $userInfos->setBusiness($this->faker->business());
