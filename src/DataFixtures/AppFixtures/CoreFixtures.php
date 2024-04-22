@@ -12,7 +12,6 @@ class CoreFixtures extends Fixture
     protected $userPasswordHasher;
     protected $faker;
 
-
     public function __construct(UserPasswordHasherInterface $userPasswordHasher)
     {
         $this->userPasswordHasher = $userPasswordHasher;
@@ -22,5 +21,4 @@ class CoreFixtures extends Fixture
     {
         
     }
-
 }

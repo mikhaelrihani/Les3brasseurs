@@ -23,8 +23,9 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
         for ($i = 0; $i < 12; $i++) {
             $cookingCategory = new CookingCategory();
             $cookingCategory->setName($this->faker->unique()->word());
-            $cookingCategory->setCreatedAt(new \DateTime($this->faker->date()));
-            $cookingCategory->setUpdatedAt(new \DateTime($this->faker->date()));
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $cookingCategory->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $cookingCategory->setCreatedAt($createdAt);
 
             $cookingCategories[] = $cookingCategory;
             $manager->persist($cookingCategory);
@@ -46,10 +47,11 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
         for ($i = 0; $i < 12; $i++) {
             $cookingsheet = new CookingSheet();
             $cookingsheet->setName($this->faker->unique()->word());
-            $cookingsheet->setSlug($this->faker->unique()->word());
+            $cookingsheet->setSlug($this->faker->unique()->slug(3, false));
             $cookingsheet->setCookingCategories($cookingCategories[array_rand($cookingCategories)]);
-            $cookingsheet->setCreatedAt(new \DateTime($this->faker->date()));
-            $cookingsheet->setUpdatedAt(new \DateTime($this->faker->date()));
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $cookingsheet->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $cookingsheet->setCreatedAt($createdAt);
 
             // Associate a unique picture with each cookingsheet
             $randomIndex = array_rand($pictures);
@@ -72,13 +74,14 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
         for ($i = 0; $i < 50; $i++) {
             $dish = new Dish();
             $dish->setName($this->faker->unique()->word());
-            $dish->setSlug($this->faker->unique()->word());
+            $dish->setSlug($this->faker->unique()->slug(3, false));
             $dish->setDescription($this->faker->text(1000));
             $dish->setComment($this->faker->text(1000));
             $dish->setHelpUrl($this->faker->url());
             $dish->setHelpText($this->faker->text(1000));
-            $dish->setCreatedAt(new \DateTime($this->faker->date()));
-            $dish->setUpdatedAt(new \DateTime($this->faker->date()));
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $dish->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $dish->setCreatedAt($createdAt);
 
             // A dish can have multiple cooking sheets, but each cooking sheet must be unique.
             $maxNbCookingSheet = (count($cookingsheets) > 4) ? 4 : count($cookingsheets);
@@ -86,15 +89,14 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
 
             $dishCookingSheets = [];
 
-            for ($j = 0; $j < $nbCookingSheet; $j++) {
+            for ($j = 0; $j < $nbCookingSheet; ) {
                 $randomIndex = array_rand($cookingsheets);
                 $selectedCookingSheet = $cookingsheets[$randomIndex];
 
                 if (!in_array($selectedCookingSheet, $dishCookingSheets)) {
                     $dish->addCookingSheet($selectedCookingSheet);
                     $dishCookingSheets[] = $selectedCookingSheet;
-                } else {
-                    $j--;
+                    $j++;
                 }
             }
 
@@ -104,17 +106,19 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
 
             $dishPictures = [];
 
-            for ($k = 0; $k <= $nbPictures; $k++) {
+            for ($k = 0; $k <= $nbPictures; ) {
                 $randomIndex = array_rand($pictures);
                 $selectedPictures = $pictures[$randomIndex];
 
                 if (!in_array($selectedPictures, $dishPictures)) {
                     $dish->addPicture($selectedPictures);
                     $dishPictures[] = $selectedPictures;
-                } else {
-                    $k--;
+                    $k++;
                 }
             }
+
+            // Remove the selected picture from the available list to ensure uniqueness
+            array_splice($pictures, $randomIndex, 1);
 
             $dishes[] = $dish;
             $manager->persist($dish);
@@ -134,17 +138,18 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
         for ($i = 0; $i < 12; $i++) {
             $menu = new Menu();
             $menu->setName($this->faker->unique()->word());
-            $menu->setSlug($this->faker->unique()->word());
+            $menu->setSlug($this->faker->unique()->slug(3, false));
             $menu->setEndDateId($dates[array_rand($dates)]);
             $menu->setStartDateId($dates[array_rand($dates)]);
             $menu->setWeek($this->faker->numberBetween(1, 52));
-            $menu->setCreatedAt(new \DateTime($this->faker->date()));
-            $menu->setUpdatedAt(new \DateTime($this->faker->date()));
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $menu->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $menu->setCreatedAt($createdAt);
 
             // A menu can have multiple dishes, but each dish must be unique.
             $maxNbDishes = (count($dishes) > 5) ? 5 : count($dishes);
             $nbDishes = rand(0, $maxNbDishes);
-         
+
             $menuDishes = [];
 
             for ($j = 0; $j <= $nbDishes; $j++) {
@@ -154,8 +159,7 @@ class CookingFixtures extends CoreFixtures implements DependentFixtureInterface
                 if (!in_array($selectedDish, $menuDishes)) {
                     $menu->addDish($selectedDish);
                     $menuDishes[] = $selectedDish;
-                }else {
-                    $j--;
+                    $j++;
                 }
             }
 

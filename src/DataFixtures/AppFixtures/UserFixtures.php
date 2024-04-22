@@ -14,7 +14,6 @@ use Symfony\Component\Uid\Uuid;
 class UserFixtures extends CoreFixtures
 {
 
-    public const UserCount = 22;
     public function load(ObjectManager $manager): void
     {
         $this->faker->addProvider(new AppProvider());
@@ -22,16 +21,17 @@ class UserFixtures extends CoreFixtures
         //! User 
         $users = [];
 
-        for ($i = 0; $i < self::UserCount; $i++) {
+        for ($i = 0; $i < 22; $i++) {
             $user = new User();
             $user->setUuid(Uuid::v4());
             $user->setRoles($this->faker->role());
             $user->setPassword($this->userPasswordHasher->hashPassword($user, $this->faker->password(8, 20)));
             $user->setFirstname($this->faker->firstName());
             $user->setSurname($this->faker->lastName());
-            $user->setSlug($this->faker->slug(3, false));
-            $user->setCreatedAt(new \DateTime($this->faker->date()));
-            $user->setUpdatedAt(new \DateTime($this->faker->date()));
+            $user->setSlug($this->faker->unique()->slug(3, false));
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $user->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $user->setCreatedAt($createdAt);
 
             $users[] = $user;
             $manager->persist($user);
@@ -45,12 +45,13 @@ class UserFixtures extends CoreFixtures
             $userInfos = new UserInfos();
             $userInfos->setUser($user);
             $userInfos->setBusiness($this->faker->business());
-            $userInfos->setphone($this->faker->phoneNumber());
-            $userInfos->setWhatsApp($this->faker->phoneNumber());
+            $userInfos->setphone($this->faker->unique()->phoneNumber());
+            $userInfos->setWhatsApp($this->faker->unique()->phoneNumber());
             $userInfos->setAvatar($this->faker->imageUrl(640, 480, 'people', true));
-            $userInfos->setEmail($this->faker->email());
-            $userInfos->setCreatedAt(new \DateTime($this->faker->date()));
-            $userInfos->setUpdatedAt(new \DateTime($this->faker->date()));
+            $userInfos->setEmail($this->faker->unique()->email());
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $userInfos->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $userInfos->setCreatedAt($createdAt);
 
             $manager->persist($userInfos);
         }
@@ -59,9 +60,10 @@ class UserFixtures extends CoreFixtures
 
         for ($i = 0; $i < 12; $i++) {
             $group = new Group();
-            $group->setName($this->faker->word());
-            $group->setCreatedAt(new \DateTime($this->faker->date()));
-            $group->setUpdatedAt(new \DateTime($this->faker->date()));
+            $group->setName($this->faker->unique()->word());
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $group->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $group->setCreatedAt($createdAt);
 
             $manager->persist($group);
             $this->addReference("group_" . $i, $group);
@@ -71,14 +73,13 @@ class UserFixtures extends CoreFixtures
 
         for ($i = 0; $i < 12; $i++) {
             $job = new Job();
-            $job->setName($this->faker->word());
-            $job->setCreatedAt(new \DateTime($this->faker->date()));
-            $job->setUpdatedAt(new \DateTime($this->faker->date()));
-
+            $job->setName($this->faker->unique()->word());
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $job->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $job->setCreatedAt($createdAt);
             $manager->persist($job);
         }
 
-        $this->addReference(self::UserCount, $user);
         $manager->flush();
 
     }

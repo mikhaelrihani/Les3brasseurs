@@ -18,17 +18,18 @@ class InventoryFixtures extends CoreFixtures implements DependentFixtureInterfac
 
         for ($i = 0; $i < 8; $i++) {
             $room = new Room();
-            $room->setName($this->faker->word());
-            $room->setCreatedAt(new \DateTime($this->faker->date()));
-            $room->setUpdatedAt(new \DateTime($this->faker->date()));
-
+            $room->setName($this->faker->unique()->word());
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $room->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $room->setCreatedAt($createdAt);
             $rooms[] = $room;
+            $this->addReference("room_" . $i, $room);
             $manager->persist($room);
         }
 
         //! Inventory
 
-        // we retrieve the dates from the references to be able to associate them with the inventories
+        // We fetch the dates from the references to link them with the inventories
         $dates = [];
         $i = 0;
         while ($this->hasReference("date_" . $i)) {
@@ -41,11 +42,11 @@ class InventoryFixtures extends CoreFixtures implements DependentFixtureInterfac
             $inventory = new Inventory();
             $inventory->setDate($dates[array_rand($dates)]);
             $inventory->setRoom($rooms[array_rand($rooms)]);
-            $inventory->setSlug($this->faker->text(10));
+            $inventory->setSlug($this->faker->slug(3, false));
             $inventory->setStatus($this->faker->text(10));
-            $inventory->setCreatedAt(new \DateTime($this->faker->date()));
-            $inventory->setUpdatedAt(new \DateTime($this->faker->date()));
-
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $inventory->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $inventory->setCreatedAt($createdAt);
             $manager->persist($inventory);
         }
 

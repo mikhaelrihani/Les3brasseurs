@@ -11,23 +11,19 @@ use App\Entity\SupplyType;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-
-
 class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 {
-
     public function load(ObjectManager $manager): void
     {
-
-
         //! SupplyType
 
         $supplytypes = [];
         for ($i = 0; $i < 12; $i++) {
             $supplytype = new SupplyType();
-            $supplytype->setName($this->faker->word());
-            $supplytype->setCreatedAt(new \DateTime($this->faker->date()));
-            $supplytype->setUpdatedAt(new \DateTime($this->faker->date()));
+            $supplytype->setName($this->faker->unique()->word());
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $supplytype->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $supplytype->setCreatedAt($createdAt);
 
             $supplytypes[] = $supplytype;
             $manager->persist($supplytype);
@@ -35,26 +31,23 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
         //! Product
 
-        // we retrieve the pictures from the references to be able to associate them with the products
+        // We fetch the pictures from the references to link them with the products
         $pictures = [];
         $i = 0;
-
         while ($this->hasReference("picture_" . $i)) {
             $picture = $this->getReference("picture_" . $i);
             $pictures[] = $picture;
             $i++;
         }
 
-        // we retrieve the rooms from the references to be able to associate them with the products
+        // We fetch the rooms from the references to link them with the products
         $rooms = [];
-        $i = 0;
-
-        while ($this->hasReference("room_" . $i)) {
-            $room = $this->getReference("room_" . $i);
+        $l = 0;
+        while ($this->hasReference("room_" . $l)) {
+            $room = $this->getReference("room_" . $l);
             $rooms[] = $room;
-            $i++;
+            $l++;
         }
-
 
         $products = [];
 
@@ -62,50 +55,50 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
             $product = new Product();
             $product->setSupplyType($supplytypes[array_rand($supplytypes)]);
             $product->setPrice($this->faker->randomFloat(2, 0, 1000));
-            $product->setSlug($this->faker->text(10));
+            $product->setSlug($this->faker->unique()->slug(3, false));
             $product->setCurrency($this->faker->currencyCode());
             $product->setConditionning($this->faker->text(10));
-            $product->setName($this->faker->word());
-            $product->setCreatedAt(new \DateTime($this->faker->date()));
-            $product->setUpdatedAt(new \DateTime($this->faker->date()));
+            $product->setName($this->faker->unique()->word());
+            // Générer une date de création aléatoire entre 5 ans et maintenant
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            // Utiliser la date de création comme limite inférieure pour la date de mise à jour
+            $product->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $product->setCreatedAt($createdAt);
 
 
 
-            // add random number ( max 5) of unique picture to each product 
 
-            $randomCount = rand(1, min(5, count($pictures)));
+            // Each product can have multiple unique pictures ,each picture must be unique to a product.
+            $maxNbPictures = (count($pictures) > 5) ? 5 : count($pictures);
+            $nbPictures = rand(0, $maxNbPictures);
             $productPictures = [];
 
-            for ($j = 0; $j < $randomCount; $j++) {
+            for ($k = 0; $k <= $nbPictures; $k++) {
+                $randomIndex = array_rand($pictures);
+                $selectedPictures = $pictures[$randomIndex];
 
-                $randomIndex = rand(0, count($pictures) - 1);
-                $picture = $pictures[$randomIndex];
-
-                if (!in_array($picture, $productPictures)) {
-                    $productPictures[] = $picture;
-                    $product->addPicture($picture);
+                if (!in_array($selectedPictures, $productPictures)) {
+                    $product->addPicture($selectedPictures);
+                    $productPictures[] = $selectedPictures;
+                    $k++;
                 }
                 // remove the picture from the pictures array to avoid adding it to another product
                 array_splice($pictures, $randomIndex, 1);
-
-                if (count($productPictures) == 5) {
-                    break;
-                }
-
             }
 
-            // add a random number of unique room to roomProducts array 
-            $randomCount = rand(1, count($rooms));
+            // Each product can have multiple unique rooms
+            $nbRooms = rand(1, count($rooms));
+            $nbMaxRooms = ($nbRooms > 4) ? 4 : $nbRooms;
             $roomProducts = [];
 
-            for ($k = 0; $k < $randomCount; $k++) {
+            for ($k = 0; $k < $nbMaxRooms; ) {
+                $randomRoomIndex = rand(array_rand($rooms), 1);
+                $selectedRooms = $rooms[$randomRoomIndex];
 
-                $randomIndex = rand(0, count($rooms) - 1);
-                $room = $rooms[$randomIndex];
-
-                if (!in_array($room, $roomProducts)) {
-                    $roomProducts[] = $room;
-                    $product->addRoom($room);
+                if (!in_array($selectedRooms, $roomProducts)) {
+                    $roomProducts[] = $selectedRooms;
+                    $product->addRoom($selectedRooms);
+                    $k++;
                 }
             }
 
@@ -117,57 +110,70 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
         //! Supplier
 
         $suppliers = [];
-        $staffIndices = range(0, UserFixtures::UserCount - 1);
-        $maxSupplierCount = floor(UserFixtures::UserCount / 4);
 
+        // We fetch the users from the references to link them with the suppliers
+        $users = [];
+        $i = 0;
 
-        // Boucle pour créer les fournisseurs
-        for ($i = 0; $i < $maxSupplierCount; $i++) {
-            $supplier = new Supplier();
-            $supplier->setName($this->faker->company());
-            $supplier->setDescription($this->faker->text(200));
-            $supplier->setComments($this->faker->text(200));
-            $supplier->setSlug($this->faker->slug(3, false));
-            $supplier->setCreatedAt(new \DateTime($this->faker->date()));
-            $supplier->setUpdatedAt(new \DateTime($this->faker->date()));
-
-            // Ajouter jusqu'à 3 employés
-            for ($k = 0; $k < rand(1, 4); $k++) {
-                $randomStaffIndex = array_rand($staffIndices);
-                $staffIndex = $staffIndices[$randomStaffIndex];
-                if (isset($staffIndex)) {
-                    $supplier->addStaff($this->getReference("user_" . $staffIndex));
-                    unset($staffIndices[$randomStaffIndex]);
-                }
-            }
-
-            // add a random number of unique products to supplierProducts array 
-            $randomCount = rand(0, count($products));
-            $supplierProducts = [];
-
-            for ($j = 0; $j < $randomCount; $j++) {
-
-                $randomIndex = rand(0, count($products) - 1);
-                $product = $products[$randomIndex];
-
-                if (!in_array($product, $supplierProducts)) {
-                    $supplierProducts[] = $product;
-                    $supplier->addProduct($product);
-                }
-            }
-            
-            $suppliers[] = $supplier;
-            $manager->persist($supplier);
+        while ($this->hasReference("user_" . $i)) {
+            $user = $this->getReference("user_" . $i);
+            $users[] = $user;
+            $i++;
         }
 
+        $nbSuppliers = floor(count($users) / 4);
+
+        for ($i = 0; $i < $nbSuppliers; $i++) {
+            $supplier = new Supplier();
+            $supplier->setName($this->faker->unique()->company());
+            $supplier->setDescription($this->faker->text(200));
+            $supplier->setComments($this->faker->text(200));
+            $supplier->setSlug($this->faker->unique()->slug(3, false));
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $supplier->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $supplier->setCreatedAt($createdAt);
+
+            // Each supplier can have multiple unique staffs and a staff cannot be part of multiple suppliers
+            $maxNbStaffs = (count($users) > 4) ? 4 : count($users);
+            $nbStaffs = rand(1, $maxNbStaffs);
+            $staffs = [];
+
+            for ($k = 0; $k < $nbStaffs; ) {
+                $randomStaffIndex = array_rand($users, 1);
+                $selectedStaff = $users[$randomStaffIndex];
+                if (!in_array($selectedStaff, $staffs)) {
+                    $supplier->addStaff($selectedStaff);
+                    $staffs[] = $selectedStaff;
+                    $k++;
+                }
+                array_splice($staffs, $randomStaffIndex, 1);
+            }
+
+            // Each supplier can have multiple unique products
+            $maxNbProducts = (count($products) > 50) ? 50 : count($products);
+            $nbProducts = rand(1, $maxNbProducts);
+            $supplierProducts = [];
+
+            for ($j = 0; $j < $nbProducts; ) {
+                $randomProductIndex = array_rand($products);
+                $selectedProduct = $products[$randomProductIndex];
+                if (!in_array($selectedProduct, $supplierProducts)) {
+                    $supplier->addProduct($selectedProduct);
+                    $supplierProducts[] = $selectedProduct;
+                    $j++;
+                }
+
+                $suppliers[] = $supplier;
+                $manager->persist($supplier);
+            }
+        }
         //! Order
 
         $orders = [];
 
-        // we retrieve the dates from the references to be able to associate them with the orders
+        // We fetch the dates from the references to link them with the orders.
         $dates = [];
         $i = 0;
-
         while ($this->hasReference("date_" . $i)) {
             $date = $this->getReference("date_" . $i);
             $dates[] = $date;
@@ -178,10 +184,11 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
             $order = new Order();
             $order->setSupplier($suppliers[array_rand($suppliers)]);
             $order->setDate($dates[array_rand($dates)]);
-            $order->setSlug($this->faker->slug(3, false));
-            $order->setName($this->faker->word());
-            $order->setCreatedAt(new \DateTime($this->faker->date()));
-            $order->setUpdatedAt(new \DateTime($this->faker->date()));
+            $order->setSlug($this->faker->unique()->slug(3, false));
+            $order->setName($this->faker->unique()->word());
+            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+            $order->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+            $order->setCreatedAt($createdAt);
 
             $orders[] = $order;
             $manager->persist($order);
@@ -190,37 +197,29 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
         //! OrdersProducts
 
         foreach ($orders as $order) {
-            // Nombre aléatoire de produits pour cette commande
-            $numberOfProducts = rand(1, 5); // Par exemple, une commande peut contenir de 1 à 5 produits
 
-            // Créer un tableau pour stocker les produits déjà ajoutés à cette commande
+            $numberOfProducts = rand(1, 20);
             $addedProducts = [];
 
-            // Ajouter des produits à la commande jusqu'à ce que le nombre spécifié soit atteint
             for ($i = 0; $i < $numberOfProducts; $i++) {
-                // Sélectionner un produit aléatoire
                 $product = $products[array_rand($products)];
 
-                // Vérifier si le produit a déjà été ajouté à cette commande
                 if (!in_array($product, $addedProducts)) {
-                    // Créer une relation entre la commande et le produit
                     $orderProduct = new OrdersProducts();
                     $orderProduct->setOrders($order);
                     $orderProduct->setProduct($product);
-                    $orderProduct->setQuantity(rand(1, 100)); // Quantité aléatoire par produit
-                    $orderProduct->setCreatedAt(new \DateTime($this->faker->date()));
-                    $orderProduct->setUpdatedAt(new \DateTime($this->faker->date()));
+                    $orderProduct->setQuantity(rand(1, 100));
+                    $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+                    $orderProduct->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
+                    $orderProduct->setCreatedAt($createdAt);
 
-                    // Ajouter le produit à la commande et le marquer comme ajouté
                     $manager->persist($orderProduct);
                     $addedProducts[] = $product;
                 }
             }
         }
 
-
         $manager->flush();
-
     }
 
     public function getDependencies()

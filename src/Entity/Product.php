@@ -31,6 +31,7 @@ class Product
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Assert\Currency]
     private ?string $currency = null;
 
     #[ORM\Column(length: 255)]
