@@ -20,10 +20,10 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
         $supplytypes = [];
         for ($i = 0; $i < 12; $i++) {
             $supplytype = new SupplyType();
-            $supplytype->setName($this->faker->unique()->word());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $supplytype->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $supplytype->setCreatedAt($createdAt);
+            $supplytype
+                ->setName($this->faker->unique()->word())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $supplytypes[] = $supplytype;
             $manager->persist($supplytype);
@@ -53,17 +53,15 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
         for ($i = 0; $i < 50; $i++) {
             $product = new Product();
-            $product->setSupplyType($supplytypes[array_rand($supplytypes)]);
-            $product->setPrice($this->faker->randomFloat(2, 0, 1000));
-            $product->setSlug($this->faker->unique()->slug(3, false));
-            $product->setCurrency($this->faker->currencyCode());
-            $product->setConditionning($this->faker->text(10));
-            $product->setName($this->faker->unique()->word());
-            // Générer une date de création aléatoire entre 5 ans et maintenant
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            // Utiliser la date de création comme limite inférieure pour la date de mise à jour
-            $product->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $product->setCreatedAt($createdAt);
+            $product
+                ->setSupplyType($supplytypes[array_rand($supplytypes)])
+                ->setPrice($this->faker->randomFloat(2, 0, 1000))
+                ->setSlug($this->faker->unique()->slug(3, false))
+                ->setCurrency($this->faker->currencyCode())
+                ->setConditionning($this->faker->text(10))
+                ->setName($this->faker->unique()->word())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
 
 
@@ -125,13 +123,13 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
         for ($i = 0; $i < $nbSuppliers; $i++) {
             $supplier = new Supplier();
-            $supplier->setName($this->faker->unique()->company());
-            $supplier->setDescription($this->faker->text(200));
-            $supplier->setComments($this->faker->text(200));
-            $supplier->setSlug($this->faker->unique()->slug(3, false));
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $supplier->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $supplier->setCreatedAt($createdAt);
+            $supplier
+                ->setName($this->faker->unique()->company())
+                ->setDescription($this->faker->text(200))
+                ->setComments($this->faker->text(200))
+                ->setSlug($this->faker->unique()->slug(3, false))
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             // Each supplier can have multiple unique staffs and a staff cannot be part of multiple suppliers
             $maxNbStaffs = (count($users) > 4) ? 4 : count($users);
@@ -182,13 +180,13 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
         for ($i = 0; $i < 50; $i++) {
             $order = new Order();
-            $order->setSupplier($suppliers[array_rand($suppliers)]);
-            $order->setDate($dates[array_rand($dates)]);
-            $order->setSlug($this->faker->unique()->slug(3, false));
-            $order->setName($this->faker->unique()->word());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $order->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $order->setCreatedAt($createdAt);
+            $order
+                ->setSupplier($suppliers[array_rand($suppliers)])
+                ->setDate($dates[array_rand($dates)])
+                ->setSlug($this->faker->unique()->slug(3, false))
+                ->setName($this->faker->unique()->word())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $orders[] = $order;
             $manager->persist($order);
@@ -206,12 +204,12 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
                 if (!in_array($product, $addedProducts)) {
                     $orderProduct = new OrdersProducts();
-                    $orderProduct->setOrders($order);
-                    $orderProduct->setProduct($product);
-                    $orderProduct->setQuantity(rand(1, 100));
-                    $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-                    $orderProduct->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-                    $orderProduct->setCreatedAt($createdAt);
+                    $orderProduct
+                        ->setOrders($order)
+                        ->setProduct($product)
+                        ->setQuantity(rand(1, 100))
+                        ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                        ->setCreatedAt($this->createdAt);
 
                     $manager->persist($orderProduct);
                     $addedProducts[] = $product;

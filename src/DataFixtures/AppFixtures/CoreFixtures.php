@@ -11,6 +11,7 @@ class CoreFixtures extends Fixture
 {
     protected $userPasswordHasher;
     protected $faker;
+    protected $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
 
     public function __construct(UserPasswordHasherInterface $userPasswordHasher)
     {

@@ -18,10 +18,9 @@ class InventoryFixtures extends CoreFixtures implements DependentFixtureInterfac
 
         for ($i = 0; $i < 8; $i++) {
             $room = new Room();
-            $room->setName($this->faker->unique()->word());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $room->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $room->setCreatedAt($createdAt);
+            $room->setName($this->faker->unique()->word())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
             $rooms[] = $room;
             $this->addReference("room_" . $i, $room);
             $manager->persist($room);
@@ -40,13 +39,12 @@ class InventoryFixtures extends CoreFixtures implements DependentFixtureInterfac
 
         for ($i = 0; $i < 20; $i++) {
             $inventory = new Inventory();
-            $inventory->setDate($dates[array_rand($dates)]);
-            $inventory->setRoom($rooms[array_rand($rooms)]);
-            $inventory->setSlug($this->faker->slug(3, false));
-            $inventory->setStatus($this->faker->text(10));
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $inventory->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $inventory->setCreatedAt($createdAt);
+            $inventory->setDate($dates[array_rand($dates)])
+                ->setRoom($rooms[array_rand($rooms)])
+                ->setSlug($this->faker->slug(3, false))
+                ->setStatus($this->faker->text(10))
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
             $manager->persist($inventory);
         }
 

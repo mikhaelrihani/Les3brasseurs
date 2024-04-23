@@ -23,32 +23,32 @@ class UserFixtures extends CoreFixtures
 
         for ($i = 0; $i < 22; $i++) {
             $user = new User();
-            $user->setUuid(Uuid::v4());
-            $user->setRoles($this->faker->role());
-            $user->setPassword($this->userPasswordHasher->hashPassword($user, $this->faker->password(8, 20)));
-            $user->setFirstname($this->faker->firstName());
-            $user->setSurname($this->faker->lastName());
-            $user->setSlug($this->faker->unique()->slug(3, false));
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $user->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $user->setCreatedAt($createdAt);
+            $user
+                ->setUuid(Uuid::v4())
+                ->setRoles($this->faker->role())
+                ->setPassword($this->userPasswordHasher->hashPassword($user, $this->faker->password(8, 20)))
+                ->setFirstname($this->faker->firstName())
+                ->setSurname($this->faker->lastName())
+                ->setSlug($this->faker->unique()->slug(3, false))
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $users[] = $user;
             $manager->persist($user);
             $this->addReference("user_" . $i, $user);
 
-        //! UserInfos
-        
+            //! UserInfos
+
             $userInfos = new UserInfos();
-            $userInfos->setUser($user);
-            $userInfos->setBusiness($this->faker->business());
-            $userInfos->setphone($this->faker->unique()->phoneNumber());
-            $userInfos->setWhatsApp($this->faker->unique()->phoneNumber());
-            $userInfos->setAvatar($this->faker->imageUrl(640, 480, 'people', true));
-            $userInfos->setEmail($this->faker->unique()->email());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $userInfos->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $userInfos->setCreatedAt($createdAt);
+            $userInfos
+                ->setUser($user)
+                ->setBusiness($this->faker->business())
+                ->setphone($this->faker->unique()->phoneNumber())
+                ->setWhatsApp($this->faker->unique()->phoneNumber())
+                ->setAvatar($this->faker->imageUrl(640, 480, 'people', true))
+                ->setEmail($this->faker->unique()->email())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $manager->persist($userInfos);
         }
@@ -57,10 +57,10 @@ class UserFixtures extends CoreFixtures
 
         for ($i = 0; $i < 12; $i++) {
             $group = new Group();
-            $group->setName($this->faker->unique()->word());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $group->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $group->setCreatedAt($createdAt);
+            $group
+                ->setName($this->faker->unique()->word())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $manager->persist($group);
             $this->addReference("group_" . $i, $group);
@@ -70,10 +70,10 @@ class UserFixtures extends CoreFixtures
 
         for ($i = 0; $i < 12; $i++) {
             $job = new Job();
-            $job->setName($this->faker->unique()->word());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $job->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $job->setCreatedAt($createdAt);
+            $job
+                ->setName($this->faker->unique()->word())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
             $manager->persist($job);
         }
 

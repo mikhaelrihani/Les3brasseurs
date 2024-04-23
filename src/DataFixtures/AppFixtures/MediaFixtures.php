@@ -23,12 +23,12 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
         for ($i = 0; $i < 12; $i++) {
             $date = new Date();
-            $date->setYear($this->faker->year());
-            $date->setMonth($this->faker->monthName());
-            $date->setDay($this->faker->dayOfMonth());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $date->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $date->setCreatedAt($createdAt);
+            $date->
+                setYear($this->faker->year())
+                ->setMonth($this->faker->monthName())
+                ->setDay($this->faker->dayOfMonth())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $dates[] = $date;
             $manager->persist($date);
@@ -40,10 +40,10 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
         $mimes = [];
         for ($i = 0; $i < 12; $i++) {
             $mime = new Mime();
-            $mime->setName($this->faker->unique()->word());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $mime->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $mime->setCreatedAt($createdAt);
+            $mime
+                ->setName($this->faker->unique()->word())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $mimes[] = $mime;
             $manager->persist($mime);
@@ -55,13 +55,13 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
         for ($i = 0; $i < 300; $i++) {
             $picture = new Picture();
-            $picture->setName($this->faker->word());
-            $picture->setSlug($this->faker->unique()->slug(3, false));
-            $picture->setPath($this->faker->unique()->imageUrl());
-            $picture->setMime($mimes[array_rand($mimes)]);
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $picture->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $picture->setCreatedAt($createdAt);
+            $picture
+                ->setName($this->faker->word())
+                ->setSlug($this->faker->unique()->slug(3, false))
+                ->setPath($this->faker->unique()->imageUrl())
+                ->setMime($mimes[array_rand($mimes)])
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $manager->persist($picture);
             $this->addReference("picture_" . $i, $picture);
@@ -72,13 +72,13 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
         $files = [];
         for ($i = 0; $i < 100; $i++) {
             $file = new File();
-            $file->setName($this->faker->unique()->word());
-            $file->setDocType($this->faker->word());
-            $file->setPath($this->faker->unique()->imageUrl());
-            $file->setMime($mimes[array_rand($mimes)]);
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $file->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $file->setCreatedAt($createdAt);
+            $file
+                ->setName($this->faker->unique()->word())
+                ->setDocType($this->faker->word())
+                ->setPath($this->faker->unique()->imageUrl())
+                ->setMime($mimes[array_rand($mimes)])
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             $files[] = $file;
             $manager->persist($file);
@@ -97,15 +97,15 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
         for ($i = 0; $i < 40; $i++) {
             $email = new Email();
-            $email->setObject($this->faker->sentence());
-            $email->setContent($this->faker->text(1000));
-            $email->setStatus($this->faker->word());
-            $email->setSender($users[array_rand($users)]);
-            $email->setDate($dates[array_rand($dates)]);
-            $email->setDelivered($this->faker->boolean());
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $email->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $email->setCreatedAt($createdAt);
+            $email
+                ->setObject($this->faker->sentence())
+                ->setContent($this->faker->text(1000))
+                ->setStatus($this->faker->word())
+                ->setSender($users[array_rand($users)])
+                ->setDate($dates[array_rand($dates)])
+                ->setDelivered($this->faker->boolean())
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
             // An email can have multiple files, but each file must be unique.
             $nbFiles = count($files) > 5 ? 5 : count($files);
@@ -113,7 +113,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
             $emailFiles = [];
             if (!empty($files)) {
-                for ($j = 0; $j < $nbMaxFiles;) {
+                for ($j = 0; $j < $nbMaxFiles; ) {
                     $randomIndex = array_rand($files);
                     $selectedFiles = $files[$randomIndex];
 
@@ -131,7 +131,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $emailReceivers = [];
 
             if (!empty($users)) {
-                for ($j = 0; $j < $nbMaxReceivers;) {
+                for ($j = 0; $j < $nbMaxReceivers; ) {
                     $randomIndex = array_rand($users);
                     $selectedReceivers = $users[$randomIndex];
 
@@ -159,14 +159,14 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
         for ($i = 0; $i < 50; $i++) {
             $notification = new Notification();
-            $notification->setName($this->faker->unique()->word(1));
-            $notification->setSlug($this->faker->unique()->slug(3, false));
-            $notification->setContent($this->faker->text(1000));
-            $notification->setType($this->faker->word(1));
-            $notification->setComment($this->faker->text(1000));
-            $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
-            $notification->setUpdatedAt($this->faker->dateTimeBetween($createdAt, 'now'));
-            $notification->setCreatedAt($createdAt);
+            $notification
+                ->setName($this->faker->unique()->word(1))
+                ->setSlug($this->faker->unique()->slug(3, false))
+                ->setContent($this->faker->text(1000))
+                ->setType($this->faker->word(1))
+                ->setComment($this->faker->text(1000))
+                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
+                ->setCreatedAt($this->createdAt);
 
 
             // A notification can be sent to multiple groups , but each group must be unique.
@@ -174,7 +174,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $nbMaxGroups = rand(1, $nbGroups);
             $notificationGroups = [];
             if (!empty($groups)) {
-                for ($j = 0; $j < $nbMaxGroups;) {
+                for ($j = 0; $j < $nbMaxGroups; ) {
                     $randomIndex = array_rand($groups);
                     $notificationGroup = $groups[$randomIndex];
 

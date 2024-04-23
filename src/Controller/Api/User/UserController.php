@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
-    #[Route('/api/user/user', name: 'app_api_user_user')]
+    #[Route('/api/user/user', name: 'app_api_user_user', methods : 'GET')]
     public function index(UserInfosRepository $userInfosRepository): JsonResponse
     {
         $users = $userInfosRepository->findAll();
