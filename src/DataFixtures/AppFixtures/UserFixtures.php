@@ -19,7 +19,6 @@ class UserFixtures extends CoreFixtures
         $this->faker->addProvider(new AppProvider());
 
         //! User 
-        $users = [];
 
         for ($i = 0; $i < 22; $i++) {
             $user = new User();
@@ -33,7 +32,6 @@ class UserFixtures extends CoreFixtures
                 ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
                 ->setCreatedAt($this->createdAt);
 
-            $users[] = $user;
             $manager->persist($user);
             $this->addReference("user_" . $i, $user);
 

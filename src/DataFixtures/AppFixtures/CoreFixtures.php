@@ -11,12 +11,13 @@ class CoreFixtures extends Fixture
 {
     protected $userPasswordHasher;
     protected $faker;
-    protected $createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
+    protected $createdAt; 
 
     public function __construct(UserPasswordHasherInterface $userPasswordHasher)
     {
         $this->userPasswordHasher = $userPasswordHasher;
         $this->faker = Factory::create("fr_FR");
+        $this->createdAt = $this->faker->dateTimeBetween('-5 years', 'now');
     }
     public function load(ObjectManager $manager): void
     {

@@ -19,17 +19,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-   
+    #[Groups(["userWithoutRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(type: UuidType::NAME)]
-    
+    #[Groups(["userWithoutRelation"])]
     private Uuid $uuid;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(["userWithoutRelation"])]
     private array $roles = [];
 
     /**
@@ -40,28 +41,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-   
+    #[Groups(["userWithoutRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    
+    #[Groups(["userWithoutRelation"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-   
+    #[Groups(["userWithoutRelation"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["userWithoutRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["userWithoutRelation"])]
     private ?\DateTimeInterface $created_at = null;
-
-    // #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-   
-    // private ?UserInfos $userInfos = null;
 
     public function getId(): ?int
     {
@@ -198,21 +197,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // public function getUserInfos(): ?UserInfos
-    // {
-    //     return $this->userInfos;
-    // }
 
-    // public function setUserInfos(UserInfos $userInfos): static
-    // {
-    //     // set the owning side of the relation if necessary
-    //     if ($userInfos->getUser() !== $this) {
-    //         $userInfos->setUser($this);
-    //     }
-
-    //     $this->userInfos = $userInfos;
-
-    //     return $this;
-    // }
 
 }

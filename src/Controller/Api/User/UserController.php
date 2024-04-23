@@ -9,15 +9,21 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
-    #[Route('/api/user/user', name: 'app_api_user_user', methods : 'GET')]
-    public function index(UserInfosRepository $userInfosRepository): JsonResponse
+    #[Route('/api/user/getUsers', name: 'app_api_user_getUsers', methods: 'GET')]
+    public function GetUsers(UserInfosRepository $userInfosRepository): JsonResponse
     {
         $users = $userInfosRepository->findAll();
         return $this->json([
             'users' => $users,
-        ]); 
-        // return $this->json([
-        //     'users' => $users,
-        // ], 200, [], ["Groups" => "userWithoutRelation"]);
+        ], 200, [], ["groups" => "userWithoutRelation"]);
+    }
+
+    #[Route('/api/user/getUsersWithRelation', name: 'app_api_user_getUsersWithRelation', methods: 'GET')]
+    public function GetUsersWithRelations(UserInfosRepository $userInfosRepository): JsonResponse
+    {
+        $users = $userInfosRepository->findAll();
+        return $this->json([
+            'users' => $users,
+        ], 200, [],);
     }
 }
