@@ -20,7 +20,14 @@ class UserInfosRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, UserInfos::class);
     }
+    public function remove(UserInfos $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
 
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 //    /**
 //     * @return UserInfos[] Returns an array of UserInfos objects
 //     */
