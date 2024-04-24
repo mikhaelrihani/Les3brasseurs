@@ -23,8 +23,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
             $pictures[] = $picture;
             $i++;
         }
-       
-        dd($pictures);
+    
     
         //! SupplyType
 
@@ -55,7 +54,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
         $products = [];
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $product = new Product();
             $product
                 ->setSupplyType($supplytypes[array_rand($supplytypes)])
@@ -71,7 +70,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
 
             // Each product can have multiple unique pictures ,each picture must be unique to a product.
-            $maxNbPictures = (count($pictures) > 5) ? 5 : count($pictures);
+            $maxNbPictures = (count($pictures) > 300) ? 300 : count($pictures);
             $nbPictures = rand(1, $maxNbPictures);
             $productPictures = [];
 
@@ -231,4 +230,5 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
             InventoryFixtures::class,
         ];
     }
+    
 }

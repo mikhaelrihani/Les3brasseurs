@@ -188,10 +188,10 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
         for ($i = 0; $i < 50; $i++) {
             $notification = new Notification();
             $notification
-                ->setName($this->faker->unique()->word(1))
+                ->setName($this->faker->unique()->word())
                 ->setSlug($this->faker->unique()->slug(3, false))
                 ->setContent($this->faker->text(1000))
-                ->setType($this->faker->word(1))
+                ->setType($this->faker->word())
                 ->setComment($this->faker->text(1000))
                 ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
                 ->setCreatedAt($this->createdAt);

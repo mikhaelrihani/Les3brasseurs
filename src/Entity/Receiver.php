@@ -39,9 +39,9 @@ class Receiver
         return $this->email;
     }
 
-    public function setEmail(string $Email): static
+    public function setEmail(string $email): static
     {
-        $this->email = $Email;
+        $this->email = $email;
 
         return $this;
     }
