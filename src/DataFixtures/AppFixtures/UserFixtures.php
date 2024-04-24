@@ -6,6 +6,7 @@ use App\DataFixtures\Provider\AppProvider;
 use App\DataFixtures\AppFixtures\CoreFixtures;
 use App\Entity\Group;
 use App\Entity\Job;
+use App\Entity\Receiver;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\User;
 use App\Entity\UserInfos;
@@ -34,7 +35,7 @@ class UserFixtures extends CoreFixtures
 
             $manager->persist($user);
             $this->addReference("user_" . $i, $user);
-
+            
             //! UserInfos
 
             $userInfos = new UserInfos();
@@ -49,6 +50,21 @@ class UserFixtures extends CoreFixtures
                 ->setCreatedAt($this->createdAt);
 
             $manager->persist($userInfos);
+            $this->addReference("userInfos_" . $i, $userInfos);
+        }
+
+        //! Receivers
+
+        for ($i = 0; $i < 12; $i++) {
+
+            $receiver = new Receiver();
+            $receiver
+                ->setEmail($this->faker->unique()->email())
+                ->setFirstname($this->faker->firstName())
+                ->setLastname($this->faker->lastName());
+
+            $manager->persist($receiver);
+            $this->addReference("receiver_" . $i, $receiver);
         }
 
         //! Groups
@@ -76,6 +92,6 @@ class UserFixtures extends CoreFixtures
         }
 
         $manager->flush();
-
+       
     }
 }

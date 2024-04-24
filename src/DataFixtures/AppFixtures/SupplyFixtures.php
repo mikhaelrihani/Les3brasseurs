@@ -15,6 +15,17 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
+       
+        $pictures = [];
+        $i = 0;
+        while ($this->hasReference("picture_" . $i)) {
+            $picture = $this->getReference("picture_" . $i);
+            $pictures[] = $picture;
+            $i++;
+        }
+       
+        dd($pictures);
+    
         //! SupplyType
 
         $supplytypes = [];
@@ -31,15 +42,8 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
         //! Product
 
-        // We fetch the pictures from the references to link them with the products
-        $pictures = [];
-        $i = 0;
-        while ($this->hasReference("picture_" . $i)) {
-            $picture = $this->getReference("picture_" . $i);
-            $pictures[] = $picture;
-            $i++;
-        }
-
+       
+       
         // We fetch the rooms from the references to link them with the products
         $rooms = [];
         $l = 0;
@@ -68,7 +72,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
 
             // Each product can have multiple unique pictures ,each picture must be unique to a product.
             $maxNbPictures = (count($pictures) > 5) ? 5 : count($pictures);
-            $nbPictures = rand(0, $maxNbPictures);
+            $nbPictures = rand(1, $maxNbPictures);
             $productPictures = [];
 
             for ($k = 0; $k <= $nbPictures; $k++) {

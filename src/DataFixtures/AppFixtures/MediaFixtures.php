@@ -53,7 +53,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
         //! Picture
 
 
-        for ($i = 0; $i < 300; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $picture = new Picture();
             $picture
                 ->setName($this->faker->word())
@@ -66,11 +66,11 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $manager->persist($picture);
             $this->addReference("picture_" . $i, $picture);
         }
-
+        
         //! File
 
         $files = [];
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $file = new File();
             $file
                 ->setName($this->faker->unique()->word())
@@ -83,10 +83,11 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $files[] = $file;
             $manager->persist($file);
         }
-
+ // We fetch the pictures from the references to link them with the products
+ 
         //! Email
 
-        // we fetch the users from the references to be able to associate them with the emails
+        // we fetch the users and usersInfos from the references to be able to associate them with the emailsSenders
         $users = [];
         $i = 0;
         while ($this->hasReference("user_" . $i)) {
@@ -95,13 +96,29 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $i++;
         }
 
-        for ($i = 0; $i < 40; $i++) {
+        $usersInfos = [];
+        $i = 0;
+        while ($this->hasReference("userInfos_" . $i)) {
+            $userInfos = $this->getReference("userInfos_" . $i);
+            $usersInfos[] = $userInfos;
+            $i++;
+        }
+
+        $randomIndex = array_rand($users);
+        $senderEmail = $usersInfos[$randomIndex]->getEmail();
+        $senderFirstName = $users[$randomIndex]->getFirstname();
+        $senderLastName = $users[$randomIndex]->getSurname();
+
+
+        for ($i = 0; $i < 10; $i++) {
             $email = new Email();
             $email
                 ->setObject($this->faker->sentence())
                 ->setContent($this->faker->text(1000))
                 ->setStatus($this->faker->word())
-                ->setSender($users[array_rand($users)])
+                ->setSenderEmail($senderEmail)
+                ->setSenderFirstName($senderFirstName)
+                ->setSenderLastName($senderLastName)
                 ->setDate($dates[array_rand($dates)])
                 ->setDelivered($this->faker->boolean())
                 ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
@@ -125,15 +142,25 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                 }
             }
 
-            // An email can have multiple receivers, but each receiver "alias user" must be unique.
-            $nbReceivers = count($users) > 10 ? 10 : count($users);
+
+            // We fetch the receivers from the references to link them with the emails.
+            $receivers = [];
+            $i = 0;
+            while ($this->hasReference("receiver_" . $i)) {
+                $receiver = $this->getReference("receiver_" . $i);
+                $receivers[] = $receiver;
+                $i++;
+            }
+
+            // An email can have multiple receivers, but each receiver must be unique.
+            $nbReceivers = count($receivers) > 5 ? 5 : count($receivers);
             $nbMaxReceivers = rand(1, $nbReceivers);
             $emailReceivers = [];
 
-            if (!empty($users)) {
+            if (!empty($receivers)) {
                 for ($j = 0; $j < $nbMaxReceivers; ) {
-                    $randomIndex = array_rand($users);
-                    $selectedReceivers = $users[$randomIndex];
+                    $randomIndex = array_rand($receivers);
+                    $selectedReceivers = $receivers[$randomIndex];
 
                     if (!in_array($selectedReceivers, $emailReceivers)) {
                         $email->addReceiver($selectedReceivers);
@@ -142,6 +169,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                     }
                 }
             }
+            
             $manager->persist($email);
         }
 
@@ -191,7 +219,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
 
         $manager->flush();
-
+       
     }
     public function getDependencies()
     {

@@ -42,15 +42,8 @@ class Email
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?user $sender = null;
 
-    /**
-     * @var Collection<int, user>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class)]
-    private Collection $receivers;
+    
 
     /**
      * @var Collection<int, file>
@@ -58,10 +51,28 @@ class Email
     #[ORM\ManyToMany(targetEntity: File::class)]
     private Collection $files;
 
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    private ?string $senderFirstName = null;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    private ?string $senderLastName = null;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    private ?string $SenderEmail = null;
+
+    /**
+     * @var Collection<int, receiver>
+     */
+    #[ORM\ManyToMany(targetEntity: receiver::class)]
+    private Collection $receivers;
+
     public function __construct()
     {
-        $this->receivers = new ArrayCollection();
         $this->files = new ArrayCollection();
+        $this->receivers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -153,42 +164,6 @@ class Email
         return $this;
     }
 
-    public function getSender(): ?user
-    {
-        return $this->sender;
-    }
-
-    public function setSender(?user $sender): static
-    {
-        $this->sender = $sender;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, user>
-     */
-    public function getReceivers(): Collection
-    {
-        return $this->receivers;
-    }
-
-    public function addReceiver(user $receiver): static
-    {
-        if (!$this->receivers->contains($receiver)) {
-            $this->receivers->add($receiver);
-        }
-
-        return $this;
-    }
-
-    public function removeReceiver(user $receiver): static
-    {
-        $this->receivers->removeElement($receiver);
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, file>
      */
@@ -213,6 +188,65 @@ class Email
         return $this;
     }
 
-   
+    public function getSenderFirstName(): ?string
+    {
+        return $this->senderFirstName;
+    }
+
+    public function setSenderFirstName(string $senderFirstName): static
+    {
+        $this->senderFirstName = $senderFirstName;
+
+        return $this;
+    }
+
+    public function getSenderLastName(): ?string
+    {
+        return $this->senderLastName;
+    }
+
+    public function setSenderLastName(string $senderLastName): static
+    {
+        $this->senderLastName = $senderLastName;
+
+        return $this;
+    }
+
+    public function getSenderEmail(): ?string
+    {
+        return $this->SenderEmail;
+    }
+
+    public function setSenderEmail(string $SenderEmail): static
+    {
+        $this->SenderEmail = $SenderEmail;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, receiver>
+     */
+    public function getReceivers(): Collection
+    {
+        return $this->receivers;
+    }
+
+    public function addReceiver(receiver $receiver): static
+    {
+        if (!$this->receivers->contains($receiver)) {
+            $this->receivers->add($receiver);
+        }
+
+        return $this;
+    }
+
+    public function removeReceiver(receiver $receiver): static
+    {
+        $this->receivers->removeElement($receiver);
+
+        return $this;
+    }
+
 
 }
