@@ -42,7 +42,7 @@ class UserController extends MainController
         $users = $userInfosRepository->findAll();
         return $this->json([
             'users' => $users,
-        ], 200, [], );
+        ], 200, [],["groups" => "userWithRelation"] );
     }
 
     //! Get USER

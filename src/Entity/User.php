@@ -19,18 +19,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(type: UuidType::NAME)]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private Uuid $uuid;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private array $roles = [];
 
     /**
@@ -41,25 +41,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["userWithoutRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     public function getId(): ?int
