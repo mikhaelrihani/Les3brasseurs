@@ -9,6 +9,7 @@ use App\Service\ValidatorErrorService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMInvalidArgumentException;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Uid\Uuid;
 
 class UserController extends AbstractController
 {
@@ -127,34 +129,51 @@ class UserController extends AbstractController
         UserInfosRepository $userInfosRepository,
         EntityManagerInterface $em,
         Request $request,
-        ValidatorInterface $validator
     ): JsonResponse {
-
-        // Find user or return error
-        $userToUpdate = $userInfosRepository->find($id);
-        if (!$userToUpdate) {
-            return $this->json(["error" => "The user with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
+        // Find user info or return error
+        $userInfoToUpdate = $userInfosRepository->find($id);
+        $initialUser = $userInfoToUpdate->getUser();
+        if (!$userInfoToUpdate) {
+            return $this->json(["error" => "The user info with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
         }
 
-        // Deserialize JSON content into object to update
+        // Deserialize JSON content into same object to update
         $jsonContent = $request->getContent();
-        $user = $serializer->deserialize($jsonContent, User::class, 'json', [
-            AbstractNormalizer::OBJECT_TO_POPULATE => $userToUpdate
-        ]);
+        $dataArray = json_decode($jsonContent, true);
+        $updatedUserInfo =
+            $serializer->deserialize($jsonContent, UserInfos::class, 'json', [
+                AbstractNormalizer::OBJECT_TO_POPULATE => $userInfoToUpdate
+            ]);
 
-        // Validate user or return validation errors
-        $dataErrors = $this->validatorError->returnErrors($user);
+        // Validate user info or return validation errors
+        $dataErrors = $this->validatorError->returnErrors($updatedUserInfo);
         if ($dataErrors) {
             return $this->json($dataErrors, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        ;
 
-        // Update property "updated_at" and save changes into database
-        $user->setUpdatedAt(new DateTimeImmutable());
+        // Update property "updated_at"
+        $updatedUserInfo->setUpdatedAt(new DateTimeImmutable());
+
+        // We take care of the ID consistency of the user info and the user
+        $updatedUserInfo->setUser($initialUser);
+
+        // We update the user properties
+        $initialUser
+            ->setFirstname($dataArray[ 'user' ][ 'firstname' ])
+            ->setSurname($dataArray[ 'user' ][ 'surname' ])
+            ->setSlug($dataArray[ 'user' ][ 'slug' ])
+            ->setUpdatedAt($updatedUserInfo->getUser()->getUpdatedAt());
+        // Validate user data
+        $userDataErrors = $this->validatorError->returnErrors($initialUser);
+        if ($userDataErrors) {
+            return $this->json($userDataErrors, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // Save changes into database
         $em->flush();
 
-        // Return json with updated user datas 
-        return $this->json($user, Response::HTTP_OK, [], );
+        // Return json with updated user info data 
+        return $this->json($userInfoToUpdate, Response::HTTP_OK);
     }
 
 
