@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\GroupRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -25,6 +27,17 @@ class Group
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
+
+    /**
+     * @var Collection<int, UserInfos>
+     */
+    #[ORM\ManyToMany(targetEntity: UserInfos::class, mappedBy: 'groupList')]
+    private Collection $userInfos;
+
+    public function __construct()
+    {
+        $this->userInfos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -63,6 +76,33 @@ class Group
     public function setUpdatedAt(\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserInfos>
+     */
+    public function getUserInfos(): Collection
+    {
+        return $this->userInfos;
+    }
+
+    public function addUserInfo(UserInfos $userInfo): static
+    {
+        if (!$this->userInfos->contains($userInfo)) {
+            $this->userInfos->add($userInfo);
+            $userInfo->addGroupList($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserInfo(UserInfos $userInfo): static
+    {
+        if ($this->userInfos->removeElement($userInfo)) {
+            $userInfo->removeGroupList($this);
+        }
 
         return $this;
     }

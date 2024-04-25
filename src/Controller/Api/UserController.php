@@ -1,16 +1,13 @@
 <?php
 
-namespace App\Controller\Api\User;
+namespace App\Controller\Api;
 
-use App\Entity\User;
+use App\Controller\MainController;
 use App\Entity\UserInfos;
 use App\Repository\UserInfosRepository;
-use App\Service\ValidatorErrorService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMInvalidArgumentException;
-use Ramsey\Uuid\Rfc4122\UuidV4;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,22 +15,15 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Uid\Uuid;
 
-class UserController extends AbstractController
+
+#[Route('/api')]
+class UserController extends MainController
 {
-    private $validatorError;
-
-    public function __construct(
-        ValidatorErrorService $validatorError
-    ) {
-        $this->validatorError = $validatorError;
-    }
 
     //! Get USERS
 
-    #[Route('/api/user/getUsers', name: 'app_api_user_getUsers', methods: 'GET')]
+    #[Route('/getUsers', name: 'app_api_user_getUsers', methods: 'GET')]
     public function getUsers(UserInfosRepository $userInfosRepository): JsonResponse
     {
         $users = $userInfosRepository->findAll();
@@ -46,7 +36,7 @@ class UserController extends AbstractController
 
     //! Get USERS WITH INFOS
 
-    #[Route('/api/user/getUsersWithInfos', name: 'app_api_user_getUsersWithInfos', methods: 'GET')]
+    #[Route('/getUsersWithInfos', name: 'app_api_user_getUsersWithInfos', methods: 'GET')]
     public function getUsersWithInfos(UserInfosRepository $userInfosRepository): JsonResponse
     {
         $users = $userInfosRepository->findAll();
@@ -57,7 +47,7 @@ class UserController extends AbstractController
 
     //! Get USER
 
-    #[Route('/api/user/getOneUser/{id}', name: 'app_api_user_getOneUser', methods: 'GET')]
+    #[Route('/getOneUser/{id}', name: 'app_api_user_getOneUser', methods: 'GET')]
     public function getOneUser(int $id, UserInfosRepository $userInfosRepository): JsonResponse
     {
         $user = $userInfosRepository->find($id);
@@ -69,7 +59,7 @@ class UserController extends AbstractController
 
     //! Get USER WITH INFOS
 
-    #[Route('/api/user/getUserWithInfos/{id}', name: 'app_api_user_getUserWithInfos', methods: 'GET')]
+    #[Route('/getUserWithInfos/{id}', name: 'app_api_user_getUserWithInfos', methods: 'GET')]
     public function getUserWithInfos(int $id, UserInfosRepository $userInfosRepository): JsonResponse
     {
         $user = $userInfosRepository->find($id);
@@ -81,7 +71,7 @@ class UserController extends AbstractController
 
     //! POST USER
 
-    #[Route('/api/user/postUser', name: 'app_api_user_postUser', methods: 'POST')]
+    #[Route('/postUser', name: 'app_api_user_postUser', methods: 'POST')]
     public function postUser(
         Request $request,
         SerializerInterface $serializer,
@@ -122,7 +112,7 @@ class UserController extends AbstractController
     }
 
     //! PUT USER
-    #[Route('/api/user/putUser/{id}', name: 'app_api_user_putUser', methods: 'PUT')]
+    #[Route('/putUser/{id}', name: 'app_api_user_putUser', methods: 'PUT')]
     public function putUser(
         int $id,
         SerializerInterface $serializer,
@@ -179,7 +169,7 @@ class UserController extends AbstractController
 
 
     //! DELETE USER
-    #[Route('/api/user/deleteUser/{id}', name: 'app_api_user_deleteUser', methods: 'DELETE')]
+    #[Route('/deleteUser/{id}', name: 'app_api_user_deleteUser', methods: 'DELETE')]
     public function deleteUser(int $id, UserInfosRepository $userInfosRepository): JsonResponse
     {
         // Find user or return error

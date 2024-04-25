@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserInfosRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -52,6 +54,20 @@ class UserInfos
     )]
     #[Assert\NotBlank]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $job = null;
+
+    /**
+     * @var Collection<int, group>
+     */
+    #[ORM\ManyToMany(targetEntity: group::class, inversedBy: 'userInfos')]
+    private Collection $groupList;
+
+    public function __construct()
+    {
+        $this->groupList = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -151,6 +167,42 @@ class UserInfos
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getJob(): ?string
+    {
+        return $this->job;
+    }
+
+    public function setJob(string $job): static
+    {
+        $this->job = $job;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, group>
+     */
+    public function getGroupList(): Collection
+    {
+        return $this->groupList;
+    }
+
+    public function addGroupList(group $groupList): static
+    {
+        if (!$this->groupList->contains($groupList)) {
+            $this->groupList->add($groupList);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupList(group $groupList): static
+    {
+        $this->groupList->removeElement($groupList);
 
         return $this;
     }
