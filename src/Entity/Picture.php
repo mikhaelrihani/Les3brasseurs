@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\PictureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PictureRepository::class)]
@@ -13,6 +14,7 @@ class Picture
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["productWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -21,11 +23,13 @@ class Picture
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Url]
+    #[Groups(["productWithRelation"])]
     private ?string $path = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -36,7 +40,7 @@ class Picture
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?mime $mime = null;
+    private ?Mime $mime = null;
 
     public function getId(): ?int
     {
@@ -103,12 +107,12 @@ class Picture
         return $this;
     }
 
-    public function getMime(): ?mime
+    public function getMime(): ?Mime
     {
         return $this->mime;
     }
 
-    public function setMime(?mime $mime): static
+    public function setMime(?Mime $mime): static
     {
         $this->mime = $mime;
 

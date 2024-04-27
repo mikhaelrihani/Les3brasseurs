@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -15,55 +16,67 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["productWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?int $price = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Currency]
+    #[Groups(["productWithRelation"])]
     private ?string $currency = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?string $conditionning = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     /**
      * @var Collection<int, picture>
      */
-    #[ORM\ManyToMany(targetEntity: picture::class)]
+    #[ORM\ManyToMany(targetEntity: Picture::class)]
+    #[Groups(["productWithRelation"])]
     private Collection $picture;
 
     /**
      * @var Collection<int, supplier>
      */
-    #[ORM\ManyToMany(targetEntity: supplier::class, inversedBy: 'products')]
+    #[ORM\ManyToMany(targetEntity: Supplier::class, inversedBy: 'products')]
+    #[Groups(["productWithRelation"])]
     private Collection $suppliers;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?supplytype $SupplyType = null;
+    #[Groups(["productWithRelation"])]
+    private ?SupplyType $SupplyType = null;
 
     /**
      * @var Collection<int, room>
      */
-    #[ORM\ManyToMany(targetEntity: room::class, inversedBy: 'products')]
+    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'products')]
+    #[Groups(["productWithRelation"])]
     private Collection $rooms;
 
     public function __construct()
@@ -194,7 +207,7 @@ class Product
         return $this->suppliers;
     }
 
-    public function addSupplier(supplier $supplier): static
+    public function addSupplier(Supplier $supplier): static
     {
         if (!$this->suppliers->contains($supplier)) {
             $this->suppliers->add($supplier);
@@ -203,19 +216,19 @@ class Product
         return $this;
     }
 
-    public function removeSupplier(supplier $supplier): static
+    public function removeSupplier(Supplier $supplier): static
     {
         $this->suppliers->removeElement($supplier);
 
         return $this;
     }
 
-    public function getSupplyType(): ?supplytype
+    public function getSupplyType(): ?SupplyType
     {
         return $this->SupplyType;
     }
 
-    public function setSupplyType(?supplytype $SupplyType): static
+    public function setSupplyType(?SupplyType $SupplyType): static
     {
         $this->SupplyType = $SupplyType;
 
@@ -230,7 +243,7 @@ class Product
         return $this->rooms;
     }
 
-    public function addRoom(room $room): static
+    public function addRoom(Room $room): static
     {
         if (!$this->rooms->contains($room)) {
             $this->rooms->add($room);
@@ -239,7 +252,7 @@ class Product
         return $this;
     }
 
-    public function removeRoom(room $room): static
+    public function removeRoom(Room $room): static
     {
         $this->rooms->removeElement($room);
 

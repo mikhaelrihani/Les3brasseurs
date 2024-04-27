@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SupplierRepository::class)]
@@ -15,10 +16,12 @@ class Supplier
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["productWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -40,7 +43,7 @@ class Supplier
     /**
      * @var Collection<int, user>
      */
-    #[ORM\ManyToMany(targetEntity: user::class)]
+    #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $staffs;
 
     /**
@@ -140,7 +143,7 @@ class Supplier
         return $this->staffs;
     }
 
-    public function addStaff(user $staff): static
+    public function addStaff(User $staff): static
     {
         if (!$this->staffs->contains($staff)) {
             $this->staffs->add($staff);
@@ -149,7 +152,7 @@ class Supplier
         return $this;
     }
 
-    public function removeStaff(user $staff): static
+    public function removeStaff(User $staff): static
     {
         $this->staffs->removeElement($staff);
 

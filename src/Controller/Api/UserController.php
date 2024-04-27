@@ -17,13 +17,13 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
-#[Route('/api')]
+#[Route('/api/users')]
 class UserController extends MainController
 {
 
     //! Get USERS
 
-    #[Route('/getUsers', name: 'app_api_user_getUsers', methods: 'GET')]
+    #[Route('/', name: 'app_api_user_getUsers', methods: 'GET')]
     public function getUsers(UserInfosRepository $userInfosRepository): JsonResponse
     {
         $users = $userInfosRepository->findAll();
@@ -36,7 +36,7 @@ class UserController extends MainController
 
     //! Get USERS WITH INFOS
 
-    #[Route('/getUsersWithInfos', name: 'app_api_user_getUsersWithInfos', methods: 'GET')]
+    #[Route('/Infos', name: 'app_api_user_getUsersWithInfos', methods: 'GET')]
     public function getUsersWithInfos(UserInfosRepository $userInfosRepository): JsonResponse
     {
         $users = $userInfosRepository->findAll();
@@ -47,7 +47,7 @@ class UserController extends MainController
 
     //! Get USER
 
-    #[Route('/getOneUser/{id}', name: 'app_api_user_getOneUser', methods: 'GET')]
+    #[Route('/{id}', name: 'app_api_user_getOneUser', methods: 'GET')]
     public function getOneUser(int $id, UserInfosRepository $userInfosRepository): JsonResponse
     {
         $user = $userInfosRepository->find($id);
@@ -59,19 +59,19 @@ class UserController extends MainController
 
     //! Get USER WITH INFOS
 
-    #[Route('/getUserWithInfos/{id}', name: 'app_api_user_getUserWithInfos', methods: 'GET')]
+    #[Route('/Infos/{id}', name: 'app_api_user_getUserWithInfos', methods: 'GET', requirements: ['id' => '\d+'])]
     public function getUserWithInfos(int $id, UserInfosRepository $userInfosRepository): JsonResponse
     {
         $user = $userInfosRepository->find($id);
         if (!$user) {
             return $this->json(["error" => "The user with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
         }
-        return $this->json($user, Response::HTTP_OK, [], );
+        return $this->json($user, Response::HTTP_OK, [],["groups" => "userWithRelation"] );
     }
 
     //! POST USER
 
-    #[Route('/postUser', name: 'app_api_user_postUser', methods: 'POST')]
+    #[Route('/', name: 'app_api_user_postUser', methods: 'POST')]
     public function postUser(
         Request $request,
         SerializerInterface $serializer,
@@ -112,7 +112,7 @@ class UserController extends MainController
     }
 
     //! PUT USER
-    #[Route('/putUser/{id}', name: 'app_api_user_putUser', methods: 'PUT')]
+    #[Route('/{id}', name: 'app_api_user_putUser', methods: 'PUT')]
     public function putUser(
         int $id,
         SerializerInterface $serializer,
@@ -169,7 +169,7 @@ class UserController extends MainController
 
 
     //! DELETE USER
-    #[Route('/deleteUser/{id}', name: 'app_api_user_deleteUser', methods: 'DELETE')]
+    #[Route('/{id}', name: 'app_api_user_deleteUser', methods: 'DELETE')]
     public function deleteUser(int $id, UserInfosRepository $userInfosRepository): JsonResponse
     {
         // Find user or return error
