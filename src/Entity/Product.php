@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -45,9 +46,7 @@ class Product
     #[Groups(["productWithRelation"])]
     private ?string $conditionning = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["productWithRelation"])]
-    private ?\DateTimeInterface $updated_at = null;
+
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(["productWithRelation"])]
@@ -56,18 +55,18 @@ class Product
     /**
      * @var Collection<int, picture>
      */
-    #[ORM\ManyToMany(targetEntity: Picture::class)]
+    #[ORM\ManyToMany(targetEntity: Picture::class,cascade: ['remove'])]
     #[Groups(["productWithRelation"])]
     private Collection $picture;
 
     /**
      * @var Collection<int, supplier>
      */
-    #[ORM\ManyToMany(targetEntity: Supplier::class, inversedBy: 'products')]
+    #[ORM\ManyToMany(targetEntity: Supplier::class, inversedBy: 'products',cascade: ['remove'])]
     #[Groups(["productWithRelation"])]
     private Collection $suppliers;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ["persist"])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["productWithRelation"])]
     private ?SupplyType $SupplyType = null;
@@ -75,9 +74,12 @@ class Product
     /**
      * @var Collection<int, room>
      */
-    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'products')]
+    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'products',cascade: ['remove'])]
     #[Groups(["productWithRelation"])]
     private Collection $rooms;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $updated_at = null;
 
     public function __construct()
     {
@@ -147,18 +149,6 @@ class Product
     public function setConditionning(string $conditionning): static
     {
         $this->conditionning = $conditionning;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updated_at): static
-    {
-        $this->updated_at = $updated_at;
 
         return $this;
     }
@@ -257,5 +247,28 @@ class Product
         $this->rooms->removeElement($room);
 
         return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updated_at): static
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getProductInfo(): array
+    {
+        return [
+            'id'            => $this->id,
+            'name'          => $this->name,
+            'price'         => $this->price,
+            'currency'      => $this->currency,
+            'conditionning' => $this->conditionning,
+        ];
     }
 }

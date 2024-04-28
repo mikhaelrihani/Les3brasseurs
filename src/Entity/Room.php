@@ -33,7 +33,7 @@ class Room
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'rooms')]
+    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'rooms',cascade: ['remove'])]
     private Collection $products;
 
     public function __construct()

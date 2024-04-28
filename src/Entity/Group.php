@@ -34,7 +34,7 @@ class Group
     /**
      * @var Collection<int, UserInfos>
      */
-    #[ORM\ManyToMany(targetEntity: UserInfos::class, mappedBy: 'groupList')]
+    #[ORM\ManyToMany(targetEntity: UserInfos::class, mappedBy: 'groupList', cascade: ['remove'])]
     private Collection $userInfos;
 
     public function __construct()

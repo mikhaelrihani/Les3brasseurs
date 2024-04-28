@@ -38,7 +38,7 @@ class CookingSheet
     /**
      * @var Collection<int, picture>
      */
-    #[ORM\ManyToMany(targetEntity: picture::class)]
+    #[ORM\ManyToMany(targetEntity: picture::class,cascade: ['remove'])]
     private Collection $pictures;
 
     public function __construct()

@@ -47,19 +47,19 @@ class Dish
     /**
      * @var Collection<int, Menu>
      */
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'dishes')]
+    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'dishes',cascade: ['remove'])]
     private Collection $menus;
 
     /**
      * @var Collection<int, picture>
      */
-    #[ORM\ManyToMany(targetEntity: picture::class)]
+    #[ORM\ManyToMany(targetEntity: picture::class,cascade: ['remove'])]
     private Collection $pictures;
 
     /**
      * @var Collection<int, cookingSheet>
      */
-    #[ORM\ManyToMany(targetEntity: cookingSheet::class)]
+    #[ORM\ManyToMany(targetEntity: cookingSheet::class,cascade: ['remove'])]
     private Collection $cookingSheet;
 
     

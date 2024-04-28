@@ -43,13 +43,13 @@ class Supplier
     /**
      * @var Collection<int, user>
      */
-    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\ManyToMany(targetEntity: User::class, cascade: ['remove'])]
     private Collection $staffs;
 
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'suppliers')]
+    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'suppliers', cascade: ['remove'])]
     private Collection $products;
 
     public function __construct()

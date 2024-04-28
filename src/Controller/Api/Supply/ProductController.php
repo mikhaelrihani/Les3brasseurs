@@ -27,7 +27,7 @@ class ProductController extends MainController
         if (!$products) {
             return $this->json(["error" => "There are no products"], Response::HTTP_BAD_REQUEST);
         }
-        return $this->json($products, Response::HTTP_OK, [],["groups" => "productWithRelation"]);
+        return $this->json($products, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
 
     }
 
@@ -40,7 +40,7 @@ class ProductController extends MainController
         if (!$product) {
             return $this->json(["error" => "The product with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
         }
-        return $this->json($product, Response::HTTP_OK, [],["groups" => "productWithRelation"]);
+        return $this->json($product, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
     }
 
     //! POST PRODUCT
@@ -59,6 +59,10 @@ class ProductController extends MainController
         if ($dataErrors) {
             return $this->json($dataErrors, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+
+        $date = new DateTimeImmutable();
+        $product->setCreatedAt($date);
+        $product->setUpdatedAt($date);
 
         $em->persist($product);
         $em->flush();

@@ -38,6 +38,9 @@ class Order
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
+    #[ORM\Column(type: Types::JSON)]
+    private array $productSnapshot = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -111,6 +114,18 @@ class Order
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getProductSnapshot(): array
+    {
+        return $this->productSnapshot;
+    }
+
+    public function setProductSnapshot(array $productSnapshot): static
+    {
+        $this->productSnapshot = $productSnapshot;
 
         return $this;
     }

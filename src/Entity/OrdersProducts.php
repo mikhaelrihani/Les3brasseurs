@@ -20,7 +20,7 @@ class OrdersProducts
     private ?order $orders = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?product $product = null;
 
     #[ORM\Column]
