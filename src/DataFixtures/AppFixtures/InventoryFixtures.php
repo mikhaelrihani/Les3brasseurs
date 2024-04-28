@@ -44,7 +44,9 @@ class InventoryFixtures extends CoreFixtures implements DependentFixtureInterfac
                 ->setSlug($this->faker->slug(3, false))
                 ->setStatus($this->faker->text(10))
                 ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
-                ->setCreatedAt($this->createdAt);
+                ->setCreatedAt($this->createdAt)
+                ->setFile($this->getReference("file_" . $i));
+                
             $manager->persist($inventory);
         }
 

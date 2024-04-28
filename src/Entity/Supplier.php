@@ -26,30 +26,35 @@ class Supplier
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["productWithRelation"])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["productWithRelation"])]
     private ?string $comments = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     /**
      * @var Collection<int, user>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $staffs;
 
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'suppliers', cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'suppliers')]
     private Collection $products;
 
     public function __construct()

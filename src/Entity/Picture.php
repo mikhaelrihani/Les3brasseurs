@@ -19,6 +19,7 @@ class Picture
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["productWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
@@ -33,13 +34,16 @@ class Picture
     private ?string $path = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ["persist"])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["productWithRelation"])]
     private ?Mime $mime = null;
 
     public function getId(): ?int

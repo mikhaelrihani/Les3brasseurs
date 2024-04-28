@@ -55,14 +55,14 @@ class Product
     /**
      * @var Collection<int, picture>
      */
-    #[ORM\ManyToMany(targetEntity: Picture::class,cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: Picture::class,cascade: ["persist"])]
     #[Groups(["productWithRelation"])]
     private Collection $picture;
 
     /**
      * @var Collection<int, supplier>
      */
-    #[ORM\ManyToMany(targetEntity: Supplier::class, inversedBy: 'products',cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: Supplier::class, inversedBy: 'products',cascade: ["persist"])]
     #[Groups(["productWithRelation"])]
     private Collection $suppliers;
 
@@ -74,7 +74,7 @@ class Product
     /**
      * @var Collection<int, room>
      */
-    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'products',cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'products',cascade: ["persist"])]
     #[Groups(["productWithRelation"])]
     private Collection $rooms;
 

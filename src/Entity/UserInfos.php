@@ -67,7 +67,7 @@ class UserInfos
     /**
      * @var Collection<int, group>
      */
-    #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'userInfos', cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'userInfos')]
     #[Groups(["userWithRelation"])]
     private Collection $groupList;
     

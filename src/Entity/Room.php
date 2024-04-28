@@ -25,15 +25,17 @@ class Room
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'rooms',cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'rooms')]
     private Collection $products;
 
     public function __construct()

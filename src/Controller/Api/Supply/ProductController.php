@@ -82,7 +82,7 @@ class ProductController extends MainController
 
     //! PUT PRODUCT
 
-    #[Route('/{id}', name: 'app_api_supply_putProduct', methods: 'PUT')]
+    #[Route('/{id}', name: 'app_api_product_putProduct', methods: 'PUT')]
     public function putProduct(
         int $id,
         SerializerInterface $serializer,
@@ -115,21 +115,27 @@ class ProductController extends MainController
 
     //! DELETE PRODUCT
 
-    #[Route('/{id}', name: 'app_api_supply_deleteProduct', methods: 'DELETE')]
-    public function deleteProduct(int $id, ProductRepository $productRepository): JsonResponse
+    #[Route('/{id}', name: 'app_api_product_deleteProduct', methods: 'DELETE')]
+    public function deleteProduct(int $id, ProductRepository $productRepository, EntityManagerInterface $em): JsonResponse
     {
         $product = $productRepository->find($id);
         if (!$product) {
             return $this->json(["error" => "The product with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
         }
         try {
-            $productRepository->remove($product, true);
+            // Supprimer manuellement les fournisseurs associés à ce produit
+            $suppliers = $product->getSuppliers();
+            // foreach ($suppliers as $supplier) {
+            //     $product->getSuppliers()->removeElement($supplier);
 
+            // }
+            $em->remove($product);
         } catch (ORMInvalidArgumentException $e) {
 
             return $this->json(["error" => "Failed to delete the product with ID " . $id . ""], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        $em->flush();
         return $this->json("The product with ID " . $id . " has been deleted successfully", Response::HTTP_OK);
     }
 

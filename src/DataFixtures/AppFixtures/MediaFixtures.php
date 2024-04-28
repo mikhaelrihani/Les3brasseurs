@@ -66,7 +66,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $manager->persist($picture);
             $this->addReference("picture_" . $i, $picture);
         }
-        
+
         //! File
 
         $files = [];
@@ -81,10 +81,11 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                 ->setCreatedAt($this->createdAt);
 
             $files[] = $file;
+            $this->addReference("file_" . $i, $file);
             $manager->persist($file);
         }
- // We fetch the pictures from the references to link them with the products
- 
+        // We fetch the pictures from the references to link them with the products
+
         //! Email
 
         // we fetch the users and usersInfos from the references to be able to associate them with the emailsSenders
@@ -169,7 +170,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                     }
                 }
             }
-            
+
             $manager->persist($email);
         }
 
@@ -219,7 +220,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
 
 
         $manager->flush();
-       
+
     }
     public function getDependencies()
     {

@@ -23,9 +23,11 @@ class SupplyType
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     public function getId(): ?int

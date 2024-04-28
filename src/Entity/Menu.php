@@ -45,7 +45,7 @@ class Menu
     /**
      * @var Collection<int, dish>
      */
-    #[ORM\ManyToMany(targetEntity: dish::class, inversedBy: 'menus',cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: dish::class, inversedBy: 'menus')]
     private Collection $dishes;
 
     public function __construct()

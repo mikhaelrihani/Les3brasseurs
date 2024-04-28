@@ -45,7 +45,7 @@ class Notification
     /**
      * @var Collection<int, group>
      */
-    #[ORM\ManyToMany(targetEntity: group::class,cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: group::class)]
     private Collection $groupUser;
 
     public function __construct()

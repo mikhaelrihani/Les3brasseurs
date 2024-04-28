@@ -15,13 +15,13 @@ class OrdersProducts
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?order $orders = null;
+    #[ORM\ManyToOne(cascade: ["remove"])]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")] 
+    private ?Order $orders = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?product $product = null;
+    #[ORM\ManyToOne(cascade: ["remove"])]
+    #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")] 
+    private ?Product $product = null;
 
     #[ORM\Column]
     private ?int $quantity = null;

@@ -37,6 +37,9 @@ class Inventory
     #[ORM\JoinColumn(nullable: false)]
     private ?room $room = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?file $file = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -110,6 +113,18 @@ class Inventory
     public function setRoom(?room $room): static
     {
         $this->room = $room;
+
+        return $this;
+    }
+
+    public function getFile(): ?file
+    {
+        return $this->file;
+    }
+
+    public function setFile(?file $file): static
+    {
+        $this->file = $file;
 
         return $this;
     }

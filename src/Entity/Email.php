@@ -48,7 +48,7 @@ class Email
     /**
      * @var Collection<int, file>
      */
-    #[ORM\ManyToMany(targetEntity: File::class, cascade: ['remove'])]
+    #[ORM\ManyToMany(targetEntity: File::class)]
     private Collection $files;
 
     #[ORM\Column(length: 255)]
