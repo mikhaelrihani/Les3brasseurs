@@ -16,45 +16,47 @@ class Supplier
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $comments = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     /**
      * @var Collection<int, user>
      */
-    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\ManyToMany(targetEntity: User::class,cascade: ["persist"])]
+    #[Groups(["supplyWithRelation"])]
     private Collection $staffs;
 
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'suppliers')]
+    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'suppliers',cascade: ["persist"])]
+    #[Groups(["supplyWithRelation"])]
     private Collection $products;
 
     public function __construct()

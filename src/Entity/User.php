@@ -19,18 +19,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(type: UuidType::NAME)]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private Uuid $uuid;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private array $roles = [];
 
     /**
@@ -41,25 +41,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["userWithoutRelation", "userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     public function getId(): ?int

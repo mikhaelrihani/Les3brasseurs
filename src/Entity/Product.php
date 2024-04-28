@@ -17,39 +17,39 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column]
     #[Assert\NotBlank]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?int $price = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Currency]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $currency = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $conditionning = null;
 
 
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     /**

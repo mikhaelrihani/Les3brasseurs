@@ -124,7 +124,7 @@ class ProductController extends MainController
         }
         try {
             // Supprimer manuellement les fournisseurs associés à ce produit
-            $suppliers = $product->getSuppliers();
+            // $suppliers = $product->getSuppliers();
             // foreach ($suppliers as $supplier) {
             //     $product->getSuppliers()->removeElement($supplier);
 
