@@ -24,9 +24,7 @@ class Order
     #[Assert\NotBlank]
     private ?string $name = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?supplier $supplier = null;
+    
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -40,6 +38,9 @@ class Order
 
     #[ORM\Column(type: Types::JSON)]
     private array $productSnapshot = [];
+
+    #[ORM\Column(length: 255)]
+    private ?string $supplierName = null;
 
     public function getId(): ?int
     {
@@ -66,18 +67,6 @@ class Order
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getSupplier(): ?supplier
-    {
-        return $this->supplier;
-    }
-
-    public function setSupplier(?supplier $supplier): static
-    {
-        $this->supplier = $supplier;
 
         return $this;
     }
@@ -126,6 +115,18 @@ class Order
     public function setProductSnapshot(array $productSnapshot): static
     {
         $this->productSnapshot = $productSnapshot;
+
+        return $this;
+    }
+
+    public function getSupplierName(): ?string
+    {
+        return $this->supplierName;
+    }
+
+    public function setSupplierName(string $supplierName): static
+    {
+        $this->supplierName = $supplierName;
 
         return $this;
     }

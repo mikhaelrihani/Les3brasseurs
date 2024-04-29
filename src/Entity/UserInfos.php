@@ -48,7 +48,7 @@ class UserInfos
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
-    #[Groups(["userWithoutRelation","userWithRelation","supplyWithRelation"])]
+    #[Groups(["userWithoutRelation","userWithRelation"])]
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
@@ -56,6 +56,7 @@ class UserInfos
         message: 'The email {{ value }} is not a valid email.',
     )]
     #[Assert\NotBlank]
+    #[Assert\Unique]
     #[Groups(["userWithRelation","supplyWithRelation"])]
     private ?string $email = null;
 
@@ -68,7 +69,7 @@ class UserInfos
      * @var Collection<int, group>
      */
     #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'userInfos')]
-    #[Groups(["userWithRelation","supplyWithRelation"])]
+    #[Groups(["userWithRelation"])]
     private Collection $groupList;
     
 

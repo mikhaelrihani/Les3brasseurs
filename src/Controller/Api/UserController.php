@@ -5,13 +5,13 @@ namespace App\Controller\Api;
 use App\Controller\MainController;
 use App\Entity\UserInfos;
 use App\Repository\UserInfosRepository;
+use App\Service\UserService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -42,7 +42,7 @@ class UserController extends MainController
         $users = $userInfosRepository->findAll();
         return $this->json([
             'users' => $users,
-        ], 200, [],["groups" => "userWithRelation"] );
+        ], 200, [], ["groups" => "userWithRelation"]);
     }
 
     //! Get USER
@@ -66,7 +66,7 @@ class UserController extends MainController
         if (!$user) {
             return $this->json(["error" => "The user with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
         }
-        return $this->json($user, Response::HTTP_OK, [],["groups" => "userWithRelation"] );
+        return $this->json($user, Response::HTTP_OK, [], ["groups" => "userWithRelation"]);
     }
 
     //! POST USER
@@ -74,30 +74,17 @@ class UserController extends MainController
     #[Route('/', name: 'app_api_user_postUser', methods: 'POST')]
     public function postUser(
         Request $request,
-        SerializerInterface $serializer,
+        UserService $userService,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $userPasswordHasher
     ): JsonResponse {
 
-        // Deserialize JSON content into User object
-        $jsonContent = $request->getContent();
-        $user = $serializer->deserialize($jsonContent, UserInfos::class, 'json');
+        $user = $userService->createUser($request);
+        if (is_array($user))
+            return $this->json($user, Response::HTTP_UNPROCESSABLE_ENTITY);
 
-        // Hashing the password
-        $password = $user->getUser()->getPassword();
-        $user->getUser()->setPassword($userPasswordHasher->hashPassword($user->getUser(), $password));
-
-        // Validate User object  or return validation errors
-        $dataErrors = $this->validatorError->returnErrors($user);
-        if ($dataErrors) {
-            return $this->json($dataErrors, Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        // Post user and save changes into database
         $em->persist($user);
         $em->flush();
 
-        // Return json with datas of new user 
         return $this->json(
             [$user],
             Response::HTTP_CREATED,

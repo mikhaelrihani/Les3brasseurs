@@ -41,12 +41,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithoutRelation", "userWithRelation","supplyWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]

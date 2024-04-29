@@ -52,11 +52,15 @@ class Product
     #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
+    private ?\DateTimeInterface $updated_at = null;
+
     /**
      * @var Collection<int, picture>
      */
     #[ORM\ManyToMany(targetEntity: Picture::class,cascade: ["persist"])]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private Collection $picture;
 
     /**
@@ -68,18 +72,17 @@ class Product
 
     #[ORM\ManyToOne(cascade: ["persist"])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?SupplyType $SupplyType = null;
 
     /**
      * @var Collection<int, room>
      */
     #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'products',cascade: ["persist"])]
-    #[Groups(["productWithRelation"])]
+    #[Groups(["productWithRelation","supplyWithRelation"])]
     private Collection $rooms;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updated_at = null;
+    
 
     public function __construct()
     {

@@ -125,6 +125,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
         $nbSuppliers = floor(count($users) / 4);
 
         for ($i = 0; $i < $nbSuppliers; $i++) {
+            
             $supplier = new Supplier();
             $supplier
                 ->setName($this->faker->unique()->company())
@@ -163,10 +164,11 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
                     $supplierProducts[] = $selectedProduct;
                     $j++;
                 }
-
-                $suppliers[] = $supplier;
-                $manager->persist($supplier);
             }
+                $suppliers[] = $supplier;
+                $this->addReference("supplier_" . $i, $supplier);
+                $manager->persist($supplier);
+            
         }
         //! Order
 
@@ -184,7 +186,7 @@ class SupplyFixtures extends CoreFixtures implements DependentFixtureInterface
         for ($i = 0; $i < 50; $i++) {
             $order = new Order();
             $order
-                ->setSupplier($suppliers[array_rand($suppliers)])
+                ->setSupplierName($this->getReference("supplier_" . rand(0, $nbSuppliers -1))->getName())
                 ->setDate($dates[array_rand($dates)])
                 ->setSlug($this->faker->unique()->slug(3, false))
                 ->setName($this->faker->unique()->word())

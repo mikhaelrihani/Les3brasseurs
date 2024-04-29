@@ -5,9 +5,12 @@ namespace App\Controller\Api\Supply;
 use App\Controller\MainController;
 use App\Entity\Supplier;
 use App\Repository\SupplierRepository;
+use App\Service\UserService;
 use DateTimeImmutable;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMInvalidArgumentException;
+use PhpParser\Node\Stmt\TryCatch;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,6 +40,7 @@ class SupplyController extends MainController
     public function getSupplier(int $id, SupplierRepository $supplierRepository): JsonResponse
     {
         $supplier = $supplierRepository->find($id);
+
         if (!$supplier) {
             return $this->json(["error" => "The supplier with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
         }
@@ -63,9 +67,15 @@ class SupplyController extends MainController
         $date = new DateTimeImmutable();
         $supplier->setCreatedAt($date);
         $supplier->setUpdatedAt($date);
-       
+
         $em->persist($supplier);
-        $em->flush();
+
+        try {
+            $em->flush();
+        } catch (UniqueConstraintViolationException $e) {
+
+            return new JsonResponse(['error' => 'A supplier with the same name already exists.'], Response::HTTP_BAD_REQUEST);
+        }
 
         return $this->json(
             [$supplier],
@@ -76,20 +86,66 @@ class SupplyController extends MainController
                     ["id" => $supplier->getId()]
                 )
             ],
+            ["groups" => "supplyWithRelation"]
 
         );
     }
 
-    //! POST SUPPLIER Staff
+    //! AddStaff
+
+    #[Route('/{id}/Staff', name: 'app_api_supply_addStaff', methods: 'POST')]
+
+    public function addStaff(
+        int $id,
+        UserService $userService,
+        Request $request,
+        EntityManagerInterface $em,
+        SupplierRepository $supplierRepository
+    ): JsonResponse {
+
+        $userData = json_decode($request->getContent(), true);
+
+        $existingUser = $userService->getUserByEmail($userData);
+
+        if ($existingUser) {
+            $staff = $existingUser;
+        } else {
+
+            $staff = $userService->createUser($request)->getUser();
+        }
+        if (is_array($staff))
+            return $this->json($staff, Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        $supplier = $supplierRepository->find($id);
+        $supplier->addStaff($staff);
+        $supplier->setUpdatedAt(new DateTimeImmutable());
+
+        $em->persist($supplier);
+        $em->flush();
+
+        return $this->json(
+            [$staff],
+            Response::HTTP_CREATED,
+            [
+                "Location" => $this->generateUrl(
+                    "app_api_user_getOneUser",
+                    ["id" => $supplier->getId()]
+                )
+            ],
+            ["groups" => "userWithRelation"]
+
+        );
+    }
+
 
     //! POST SUPPLIER product
-    
+
 
 
     //! PUT SUPPLIER
 
     #[Route('/{id}', name: 'app_api_supply_putSuppplier', methods: 'PUT')]
-    public function putProduct(
+    public function putSupplier(
         int $id,
         SerializerInterface $serializer,
         SupplierRepository $supplierRepository,
@@ -97,15 +153,15 @@ class SupplyController extends MainController
         Request $request,
     ): JsonResponse {
 
-        $suplierToUpdate = $supplierRepository->find($id);
-        if (!$suplierToUpdate) {
+        $supplierToUpdate = $supplierRepository->find($id);
+        if (!$supplierToUpdate) {
             return $this->json(["error" => "The supplier with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
         }
-
         $jsonContent = $request->getContent();
+
         $updatedSupplier =
             $serializer->deserialize($jsonContent, Supplier::class, 'json', [
-                AbstractNormalizer::OBJECT_TO_POPULATE => $suplierToUpdate
+                AbstractNormalizer::OBJECT_TO_POPULATE => $supplierToUpdate
             ]);
 
         $dataErrors = $this->validatorError->returnErrors($updatedSupplier);
@@ -113,10 +169,10 @@ class SupplyController extends MainController
             return $this->json($dataErrors, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $updatedSupplier->setUpdatedAt(new DateTimeImmutable());
+
         $em->flush();
 
-        return $this->json($updatedSupplier, Response::HTTP_OK);
+        return $this->json($updatedSupplier, Response::HTTP_OK, [], ["groups" => "supplyWithRelation"]);
     }
 
     //! DELETE SUPPLIER
@@ -136,7 +192,7 @@ class SupplyController extends MainController
         }
 
         $em->flush();
-        return $this->json("The supplier with ID " . $id . " has been deleted successfully", Response::HTTP_OK);
+        return $this->json("The supplier with ID " . $id . " has been deleted successfully", Response::HTTP_OK, [], ["groups" => "supplyWithRelation"]);
     }
 
 }
