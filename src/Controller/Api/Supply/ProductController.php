@@ -3,7 +3,11 @@
 namespace App\Controller\Api\Supply;
 
 use App\Controller\MainController;
+use App\Entity\Picture;
 use App\Entity\Product;
+use App\Entity\Room;
+use App\Entity\Supplier;
+use App\Entity\SupplyType;
 use App\Repository\ProductRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -64,6 +68,10 @@ class ProductController extends MainController
         $product->setCreatedAt($date);
         $product->setUpdatedAt($date);
 
+        $supplyType = json_decode($jsonContent)->SupplyType->id;
+        $supplyType = $em->getRepository(SupplyType::class)->find($supplyType);
+        $product->setSupplyType($supplyType);
+
         $em->persist($product);
         $em->flush();
 
@@ -76,10 +84,92 @@ class ProductController extends MainController
                     ["id" => $product->getId()]
                 )
             ],
+            ["groups" => "productWithRelation"]
 
         );
     }
 
+    //! Add Supplier to Product
+
+    #[Route('/{id}/addSupplier/{supplierId}', name: 'app_api_product_addSupplier', methods: 'PUT')]
+    public function addSupplierToProduct(
+        int $id,
+        int $supplierId,
+        ProductRepository $productRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+
+        $product = $productRepository->find($id);
+        if (!$product) {
+            return $this->json(["error" => "The product with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $supplier = $em->getRepository(Supplier::class)->find($supplierId);
+        if (!$supplier) {
+            return $this->json(["error" => "The supplier with ID " . $supplierId . " does not exist"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $product->addSupplier($supplier);
+        $em->flush();
+
+        return $this->json($product, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
+    }
+
+    //! Add Room to Product
+
+    #[Route('/{id}/addRoom/{roomId}', name: 'app_api_product_addRoom', methods: 'PUT')]
+
+    public function addRoomToProduct(
+        int $id,
+        int $roomId,
+        ProductRepository $productRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+
+        $product = $productRepository->find($id);
+        if (!$product) {
+            return $this->json(["error" => "The product with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $room = $em->getRepository(Room::class)->find($roomId);
+        if (!$room) {
+            return $this->json(["error" => "The room with ID " . $roomId . " does not exist"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $product->addRoom($room);
+        $em->flush();
+
+        return $this->json($product, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
+    }
+
+    //! Add Picture to Product
+
+    #[Route('/{id}/addPicture/{pictureId}', name: 'app_api_product_addPicture', methods: 'PUT')]
+
+    public function addPictureToProduct(
+        int $id,
+        string $pictureId,
+        ProductRepository $productRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+
+        $product = $productRepository->find($id);
+        if (!$product) {
+            return $this->json(["error" => "The product with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $picture = $em->getRepository(Picture::class)->find($pictureId);
+        if (!$picture) {
+            return $this->json(["error" => "The picture with ID " . $picture . " does not exist"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $product->addPicture($picture);
+        $em->flush();
+
+        return $this->json($product, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
+    }
+
+    
     //! PUT PRODUCT
 
     #[Route('/{id}', name: 'app_api_product_putProduct', methods: 'PUT')]
@@ -110,7 +200,7 @@ class ProductController extends MainController
         $updatedProduct->setUpdatedAt(new DateTimeImmutable());
         $em->flush();
 
-        return $this->json($updatedProduct, Response::HTTP_OK);
+        return $this->json($updatedProduct, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
     }
 
     //! DELETE PRODUCT

@@ -137,11 +137,6 @@ class SupplyController extends MainController
         );
     }
 
-
-    //! POST SUPPLIER product
-
-
-
     //! PUT SUPPLIER
 
     #[Route('/{id}', name: 'app_api_supply_putSuppplier', methods: 'PUT')]

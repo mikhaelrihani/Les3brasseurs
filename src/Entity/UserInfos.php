@@ -51,12 +51,11 @@ class UserInfos
     #[Groups(["userWithoutRelation","userWithRelation"])]
     private ?User $user = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(unique: true,length: 255)]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     #[Assert\NotBlank]
-    #[Assert\Unique]
     #[Groups(["userWithRelation","supplyWithRelation"])]
     private ?string $email = null;
 

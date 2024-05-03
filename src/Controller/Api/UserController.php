@@ -71,7 +71,7 @@ class UserController extends MainController
 
     //! POST USER
 
-    #[Route('/', name: 'app_api_user_postUser', methods: 'POST')]
+    #[Route('/post', name: 'app_api_user_postUser', methods: 'POST')]
     public function postUser(
         Request $request,
         UserService $userService,
