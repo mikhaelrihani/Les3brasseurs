@@ -20,11 +20,6 @@ class Picture
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Groups(["productWithRelation","supplyWithRelation"])]
-    private ?string $slug = null;
-
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -41,26 +36,14 @@ class Picture
     #[Groups(["productWithRelation","supplyWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\ManyToOne(cascade: ["persist"])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\Column(length: 255)]
     #[Groups(["productWithRelation","supplyWithRelation"])]
-    private ?Mime $mime = null;
+    private ?string $mime = null;
+
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getSlug(): ?string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(string $slug): static
-    {
-        $this->slug = $slug;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -111,15 +94,17 @@ class Picture
         return $this;
     }
 
-    public function getMime(): ?Mime
+    public function getMime(): ?string
     {
         return $this->mime;
     }
 
-    public function setMime(?Mime $mime): static
+    public function setMime(string $mime): static
     {
         $this->mime = $mime;
 
         return $this;
     }
+
+  
 }

@@ -6,7 +6,6 @@ use App\DataFixtures\AppFixtures\CoreFixtures;
 use App\Entity\Date;
 use App\Entity\Email;
 use App\Entity\File;
-use App\Entity\Mime;
 use App\Entity\Notification;
 use App\Entity\Picture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -35,20 +34,6 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $this->addReference("date_" . $i, $date);
         }
 
-        //! Mime
-
-        $mimes = [];
-        for ($i = 0; $i < 12; $i++) {
-            $mime = new Mime();
-            $mime
-                ->setName($this->faker->unique()->word())
-                ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
-                ->setCreatedAt($this->createdAt);
-
-            $mimes[] = $mime;
-            $manager->persist($mime);
-
-        }
 
         //! Picture
 
@@ -57,9 +42,8 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
             $picture = new Picture();
             $picture
                 ->setName($this->faker->word())
-                ->setSlug($this->faker->unique()->slug(3, false))
                 ->setPath($this->faker->unique()->imageUrl())
-                ->setMime($mimes[array_rand($mimes)])
+                ->setMime($this->faker->word())
                 ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
                 ->setCreatedAt($this->createdAt);
 
@@ -76,7 +60,7 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
                 ->setName($this->faker->unique()->word())
                 ->setDocType($this->faker->word())
                 ->setPath($this->faker->unique()->imageUrl())
-                ->setMime($mimes[array_rand($mimes)])
+                ->setMime($this->faker->word())
                 ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
                 ->setCreatedAt($this->createdAt);
 

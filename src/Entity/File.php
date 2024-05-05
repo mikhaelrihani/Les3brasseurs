@@ -33,11 +33,11 @@ class File
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $mime = null;
+
   
-    #[ORM\ManyToOne(targetEntity: Mime::class)]
-    #[ORM\JoinColumn(name: "mime_id", referencedColumnName: "id", nullable: false)]
-    #[Assert\NotBlank]
-    private ?Mime $mime = null;
+   
 
     public function getId(): ?int
     {
@@ -104,15 +104,17 @@ class File
         return $this;
     }
 
-    public function getMime(): ?mime
+    public function getMime(): ?string
     {
         return $this->mime;
     }
 
-    public function setMime(?mime $mime): static
+    public function setMime(string $mime): static
     {
         $this->mime = $mime;
 
         return $this;
     }
+
+  
 }

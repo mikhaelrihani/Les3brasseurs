@@ -3,14 +3,13 @@
 namespace App\Controller\Api\Supply;
 
 use App\Controller\MainController;
-use App\Entity\Picture;
 use App\Entity\Product;
 use App\Entity\Room;
 use App\Entity\Supplier;
 use App\Entity\SupplyType;
 use App\Repository\ProductRepository;
+use App\Service\ImageEntityService;
 use App\Service\ImageKitService;
-use App\Service\UploadService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMInvalidArgumentException;
@@ -152,35 +151,16 @@ class ProductController extends MainController
     public function addPictureToProduct(
         int $id,
         Request $request,
-        ProductRepository $productRepository,
-        EntityManagerInterface $em,
-        UploadService $uploadService,
         ImageKitService $imageKit,
+        ImageEntityService $imageEntityService,
     ): JsonResponse {
 
-
-
-        $uploadedFile = $request->files->get('image');
-        //dd($uploadedFile->getPathname());
-        //$uploadService->upload($uploadedFile);
-        
-        $imageKit = $imageKit->authenticateImageKit();
-        $uploadFile = $imageKit->uploadFile([
-            'file'     => 'public\upload\Blockchain-1024x640-663636a619bcd.jpg', # required, "binary","base64" or "file url"
-            'fileName' => 'Omika' # required
-        ]);
-        dd($uploadFile);
-        $product = $productRepository->find($id);
-        if (!$product) {
-            return $this->json(["error" => "The product with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
-        }
-
-        $product->addPicture($uploadedFile);
-        $em->flush();
+        $pictures = $request->files->all();
+        $uploadedPictures = $imageKit->uploadUniquePictures($pictures);
+        $product = $imageEntityService->addPictures(Product::class, $id, $uploadedPictures);
 
         return $this->json($product, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
 
-   
     }
 
 
