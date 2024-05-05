@@ -51,7 +51,7 @@ class ImageEntityService
 
             return $object;
         } catch (\Exception $e) {
-            // Gérer l'erreur ici, par exemple, journaliser l'erreur ou lancer une nouvelle exception
+            
             throw new \Exception("Error adding pictures: " . $e->getMessage());
         }
     }
