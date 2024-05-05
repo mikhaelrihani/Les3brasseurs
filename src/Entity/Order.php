@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
@@ -14,32 +15,40 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["orderWithRelation"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["orderWithRelation"])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["orderWithRelation"])]
     private ?string $name = null;
 
     
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?date $date = null;
+    #[Groups(["orderWithRelation"])]
+    private ?Date $date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["orderWithRelation"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["orderWithRelation"])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::JSON)]
+    #[Groups(["orderWithRelation"])]
     private array $productSnapshot = [];
 
     #[ORM\Column(length: 255)]
+    #[Groups(["orderWithRelation"])]
     private ?string $supplierName = null;
 
     public function getId(): ?int

@@ -18,11 +18,11 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/suppliers')]
-class SupplyController extends MainController
+class SupplierController extends MainController
 {
     //! GET SUPPLIERS
 
-    #[Route('/', name: 'app_api_supply_getSupppliers', methods: 'GET')]
+    #[Route('/', name: 'app_api_supplier_getSupppliers', methods: 'GET')]
     public function getSuppliers(SupplierRepository $supplierRepository): JsonResponse
     {
         $suppliers = $supplierRepository->findAll();
@@ -35,7 +35,7 @@ class SupplyController extends MainController
 
     //! GET SUPPLIER
 
-    #[Route('/{id}', name: 'app_api_supply_getSuppplier', methods: 'GET')]
+    #[Route('/{id}', name: 'app_api_supplier_getSuppplier', methods: 'GET')]
     public function getSupplier(int $id, SupplierRepository $supplierRepository): JsonResponse
     {
         $supplier = $supplierRepository->find($id);
@@ -48,7 +48,7 @@ class SupplyController extends MainController
 
     //! POST SUPPLIER
 
-    #[Route('/post', name: 'app_api_supply_postSuppplier', methods: 'POST')]
+    #[Route('/post', name: 'app_api_supplier_postSuppplier', methods: 'POST')]
     public function postSuppplier(
         Request $request,
         SerializerInterface $serializer,
@@ -92,7 +92,7 @@ class SupplyController extends MainController
 
     //! AddStaff
 
-    #[Route('/{id}/Staff', name: 'app_api_supply_addStaff', methods: 'POST')]
+    #[Route('/{id}/Staff', name: 'app_api_supplier_addStaff', methods: 'POST')]
 
     public function addStaff(
         int $id,
@@ -138,7 +138,7 @@ class SupplyController extends MainController
 
     //! PUT SUPPLIER
 
-    #[Route('/{id}', name: 'app_api_supply_putSuppplier', methods: 'PUT')]
+    #[Route('/{id}', name: 'app_api_supplier_putSuppplier', methods: 'PUT')]
     public function putSupplier(
         int $id,
         SerializerInterface $serializer,
@@ -171,7 +171,7 @@ class SupplyController extends MainController
 
     //! DELETE SUPPLIER
 
-    #[Route('/{id}', name: 'app_api_supply_deleteSuppplier', methods: 'DELETE')]
+    #[Route('/{id}', name: 'app_api_supplier_deleteSuppplier', methods: 'DELETE')]
     public function deleteSupplier(int $id, SupplierRepository $supplierRepository, EntityManagerInterface $em): JsonResponse
     {
         $supplier = $supplierRepository->find($id);
