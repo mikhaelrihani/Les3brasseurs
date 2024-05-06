@@ -24,10 +24,10 @@ class Date
     #[Groups(["orderWithRelation"])]
     private ?int $year = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(["orderWithRelation"])]
-    private ?string $month = null;
+    private ?int $month = null;
 
     #[ORM\Column]
     #[Assert\NotBlank]
