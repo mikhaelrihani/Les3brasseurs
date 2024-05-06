@@ -23,9 +23,9 @@ class MediaFixtures extends CoreFixtures implements DependentFixtureInterface
         for ($i = 0; $i < 12; $i++) {
             $date = new Date();
             $date->
-                setYear($this->faker->year())
-                ->setMonth($this->faker->monthName())
-                ->setDay($this->faker->dayOfMonth())
+                setYear(floor(rand(1978,2024)))
+                ->setMonth(floor(rand(1,12)))
+                ->setDay(floor(rand(1,28)))
                 ->setUpdatedAt($this->faker->dateTimeBetween($this->createdAt, 'now'))
                 ->setCreatedAt($this->createdAt);
 
