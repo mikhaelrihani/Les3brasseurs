@@ -5,11 +5,9 @@
 namespace App\Controller\Api\Supply;
 
 use App\Controller\MainController;
-use App\Entity\Order;
 use App\Entity\Supplier;
 use App\Repository\OrderRepository;
 use App\Repository\SupplierRepository;
-use App\Service\UserService;
 use DateTimeImmutable;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -58,35 +56,31 @@ class OrderController extends MainController
     public function getOrdersBy(Request $request, OrderRepository $orderRepository): JsonResponse
     {
         $queryParams = $request->query->all();
-
-        // Vérifier si au moins un paramètre de requête est fourni
+        $queryBuilder = $orderRepository->createQueryBuilder('o');
+       
         if (empty($queryParams)) {
-            return $this->json(["error" => "No query parameters provided"], Response::HTTP_BAD_REQUEST);
+            return $this->json(["error" => "No query parameter provided"], Response::HTTP_BAD_REQUEST);
         }
 
-        // Convertir les valeurs JSON en tableau associatif
+        // Construire la requête en fonction des paramètres de requête fournis
         foreach ($queryParams as $key => $value) {
             if ($this->isJson($value)) {
-                $queryParams[$key] = json_decode($value, true);
+                $dateParams = json_decode($value, true);
             }
-        }
-        $queryBuilder = $orderRepository->createQueryBuilder('o');
-        foreach ($queryParams as $key => $value) {
-           
-                if (is_array($value)) {
-                foreach ($value as $subKey => $subValue) {
-                    $queryBuilder->innerJoin('o.date', 'd');
-                    $queryBuilder->andWhere("d.$subKey = :$subKey")->setParameter($subKey, $subValue);
-                }
-            } else {
-                $queryBuilder->andWhere("o.$key = :$key")->setParameter($key, $value);
-            }
-        }
-        
+            if ($key === 'date')
+                $this->addDateFilter($queryBuilder, $dateParams);
 
+            if ($key === 'period')
+                $this->addPeriodFilter($queryBuilder, $dateParams);
+
+            if ($key === 'supplierName') {
+                $queryBuilder->andWhere("o.supplierName = :supplierName")->setParameter('supplierName', $value);
+            }
+
+        }
         // Exécuter la requête
         $orders = $queryBuilder->getQuery()->getResult();
-
+        
         if (empty($orders)) {
             return $this->json(["error" => "No orders found for the provided query parameters"], Response::HTTP_NOT_FOUND);
         }
@@ -191,6 +185,7 @@ class OrderController extends MainController
         $em->flush();
         return $this->json("The supplier with ID " . $id . " has been deleted successfully", Response::HTTP_OK, [], ["groups" => "supplyWithRelation"]);
     }
+
 
 }
 
