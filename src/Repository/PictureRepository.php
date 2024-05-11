@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Picture;
+use App\Service\ImageKitService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,12 +17,32 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PictureRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Picture::class);
     }
+    public function isValidMime(Picture $picture)
+    {
+        $extension = $picture->getMime();
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'jfif'];
+        if (!in_array($extension, $allowedExtensions)) {
+            throw new \InvalidArgumentException("Invalid image file extension");
+        } else {
+            return true;
 
-//    /**
+        }
+    }
+
+    public function removePictureFrom($picture, array $entities)
+    {
+        foreach ($entities as $entity) {
+            $entity->removePicture($picture);
+        }
+    }
+
+
+    //    /**
 //     * @return Picture[] Returns an array of Picture objects
 //     */
 //    public function findByExampleField($value): array
@@ -36,7 +57,7 @@ class PictureRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Picture
+    //    public function findOneBySomeField($value): ?Picture
 //    {
 //        return $this->createQueryBuilder('p')
 //            ->andWhere('p.exampleField = :val')
