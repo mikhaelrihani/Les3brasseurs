@@ -33,7 +33,8 @@ class FileController extends MainController
         // Chemin de téléversement sur le serveur distant
         $remoteBasePath = $this->phpseclibService->getFileUploadDirectory();
         $fileName = $uploadedFile->getClientOriginalName();
-        $remoteFilePath = $remoteBasePath . $fileName;
+        $remoteFilePath = $remoteBasePath ."/" . $fileName;
+        
 
         // Téléverser le fichier
         try {
@@ -64,15 +65,17 @@ class FileController extends MainController
 
         // Télécharger le fichier
         try {
-            $localFilePath = "public\download";
-            //dd($localFilePath);
+            $localFilePath = $this->getParameter('kernel.project_dir') . $this->phpseclibService->getFileDownloadDirectory();
+           
+
             $this->phpseclibService->downloadFile($sftp, $remoteFilePath, $localFilePath);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
+      
         // Retourner le fichier téléchargé
         $response = new Response(file_get_contents($localFilePath));
+       
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
         return $response;
     }

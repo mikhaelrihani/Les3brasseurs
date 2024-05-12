@@ -25,5 +25,6 @@ services:
     App\Service\PhpseclibService:
         arguments:
             $fileUploadDirectory: '%env(FILE_UPLOAD_DIRECTORY)%'
+            $fileDownloadDirectory: '%env(FILE_DOWNLOAD_DIRECTORY)%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

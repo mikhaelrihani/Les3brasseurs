@@ -8,10 +8,12 @@ use phpseclib3\Net\SFTP;
 class PhpseclibService
 {
     protected $fileUploadDirectory;
+    protected $fileDownloadDirectory;
 
-    public function __construct($fileUploadDirectory)
+    public function __construct($fileUploadDirectory,$fileDownloadDirectory)
     {
         $this->fileUploadDirectory = $fileUploadDirectory;
+        $this->fileDownloadDirectory = $fileDownloadDirectory;
     }
     public function authenticate()
     {
@@ -60,5 +62,9 @@ class PhpseclibService
     public function getFileUploadDirectory()
     {
         return $this->fileUploadDirectory;
+    }
+    public function getFileDownloadDirectory()
+    {
+        return $this->fileDownloadDirectory;
     }
 }
