@@ -34,12 +34,7 @@ class PictureRepository extends ServiceEntityRepository
         }
     }
 
-    public function removePictureFrom($picture, array $entities)
-    {
-        foreach ($entities as $entity) {
-            $entity->removePicture($picture);
-        }
-    }
+   
 
 
     //    /**

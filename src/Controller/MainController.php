@@ -10,6 +10,7 @@ class MainController extends AbstractController
 {
 
     protected $validatorError;
+    protected $baseURL = "https://ik.imagekit.io/";
 
     public function __construct(
         ValidatorErrorService $validatorError
