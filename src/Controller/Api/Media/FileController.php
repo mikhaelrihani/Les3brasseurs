@@ -53,7 +53,6 @@ class FileController extends MainController
     public function download(Request $request): Response
     {
         $sftp = $this->phpseclibService->authenticate();
-
         // Récupérer le nom du fichier à télécharger
         $fileName = $request->query->get('file');
         if (!$fileName)
@@ -65,19 +64,15 @@ class FileController extends MainController
 
         // Télécharger le fichier
         try {
-            $localFilePath = $this->getParameter('kernel.project_dir') . $this->phpseclibService->getFileDownloadDirectory();
-           
-
-            $this->phpseclibService->downloadFile($sftp, $remoteFilePath, $localFilePath);
+            $this->phpseclibService->downloadFile($sftp, $remoteFilePath,$_ENV['FILE_DOWNLOAD_DIRECTORY']. "\\" . $fileName);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-      
+        
         // Retourner le fichier téléchargé
-        $response = new Response(file_get_contents($localFilePath));
-       
+        $response = new Response(file_get_contents($_ENV['FILE_DOWNLOAD_DIRECTORY']. "\\" . $fileName));
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
         return $response;
     }
-
+    
 }

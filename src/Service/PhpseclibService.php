@@ -45,6 +45,7 @@ class PhpseclibService
         if (!$sftp->get($remoteFile, $localFile)) {
             throw new \Exception("Download failed");
         }
+       
     }
 
     public function listFiles($sftp, $directory)
