@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\FileRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
@@ -13,18 +14,22 @@ class File
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["fileWithRelation"])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(unique: true,length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["fileWithRelation"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["fileWithRelation"])]
     private ?string $docType = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(["fileWithRelation"])]
     private ?string $path = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -34,6 +39,7 @@ class File
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["fileWithRelation"])]
     private ?string $mime = null;
 
   
