@@ -83,19 +83,6 @@ class UserFixtures extends CoreFixtures
             $this->addReference("userInfos_" . $k, $userInfos);
         }
 
-        //! Receivers
-
-        for ($i = 0; $i < 12; $i++) {
-
-            $receiver = new Receiver();
-            $receiver
-                ->setEmail($this->faker->unique()->email())
-                ->setFirstname($this->faker->firstName())
-                ->setLastname($this->faker->lastName());
-
-            $manager->persist($receiver);
-            $this->addReference("receiver_" . $i, $receiver);
-        }
 
         $manager->flush();
 

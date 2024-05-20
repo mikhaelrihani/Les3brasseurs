@@ -49,6 +49,19 @@ class ProductController extends MainController
         return $this->json($product, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
     }
 
+    //! GET SUPPLIERS BY PRODUCT
+
+    #[Route('/{id}/suppliers', name: 'app_api_product_getSuppliersByProduct', methods: 'GET')]
+    public function getSuppliersByProduct(int $id, ProductRepository $productRepository): JsonResponse
+    {
+        $product = $productRepository->find($id);
+        if (!$product) {
+            return $this->json(["error" => "The product with ID " . $id . " does not exist"], Response::HTTP_BAD_REQUEST);
+        }
+        $suppliers = $product->getSuppliers();
+        return $this->json($suppliers, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
+    }
+
     //! POST PRODUCT
 
     #[Route('/post', name: 'app_api_product_postProduct', methods: 'POST')]
