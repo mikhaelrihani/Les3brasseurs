@@ -5,23 +5,27 @@ namespace App\Controller\Api\Media;
 use App\Controller\MainController;
 use App\Repository\FileRepository;
 use App\Service\FileService;
+use App\Service\MailerService;
 use App\Service\PhpseclibService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 #[Route('/api/files')]
 class FileController extends MainController
 {
     private PhpseclibService $phpseclibService;
     private FileService $fileService;
+    private MailerService $mailerService;
 
-    function __construct(PhpseclibService $phpseclibService, FileService $fileService)
+    function __construct(PhpseclibService $phpseclibService, FileService $fileService, MailerService $mailerService)
     {
         $this->phpseclibService = $phpseclibService;
         $this->fileService = $fileService;
+        $this->mailerService = $mailerService;
     }
 
     //! GET FILE 
@@ -33,7 +37,7 @@ class FileController extends MainController
         if (!$file)
             return new JsonResponse(['error' => 'File not found'], Response::HTTP_NOT_FOUND);
 
-        return $this->json($file, Response::HTTP_OK,[], ['groups' => 'fileWithRelation']);
+        return $this->json($file, Response::HTTP_OK, [], ['groups' => 'fileWithRelation']);
 
     }
 
@@ -61,7 +65,7 @@ class FileController extends MainController
         if (in_array($extension, $notAllowedExtensions)) {
             return new JsonResponse(['error' => 'File extension not allowed'], Response::HTTP_BAD_REQUEST);
         }
-        
+
         // Téléverser le fichier
         try {
             $this->phpseclibService->uploadFile($sftp, $uploadedFile->getPathname(), $remoteFilePath);
@@ -72,6 +76,14 @@ class FileController extends MainController
         //  Ajouter le fichier à la base de données
 
         $this->fileService->postDb($doctype, $remoteFilePath, $fileName);
+
+        // envoyer un email de confirmation pour le fichier téléversé
+        // $this->mailerService->sendMail("contact@omika.fr", "hello subject");
+
+        // $dsn = $_ENV[ 'MAILER_DSN' ];
+        // $dsn = Dsn::fromString($dsn);
+        //  dd($dsn->getUser(), $dsn->getPassword(), $dsn->getHost(), $dsn->getPort());
+
 
         return new JsonResponse([
             'message' => 'File uploaded successfully'
