@@ -12,10 +12,13 @@ use Symfony\Component\Mime\Email;
 class MailController extends AbstractController
 {
     private EmailFacade $emailFacade;
+    private Request $request;
 
-    public function __construct(EmailFacade $emailFacade)
+    public function __construct(EmailFacade $emailFacade, Request $request)
     {
         $this->emailFacade = $emailFacade;
+        $this->request = $request;
+
     }
 
     #[Route('/mail', name: 'mail')]
@@ -39,6 +42,8 @@ class MailController extends AbstractController
     #[Route('/mailWelcome', name: 'mailWelcome')]
     public function sendWelcomeEmail(string $username): Response
     {
+        $data = json_decode($this->request->getContent(), true);
+        $username = $data[ 'username' ];
         $this->emailFacade->sendWelcomeEmail($username);
         return new Response('Welcome email sent successfully');
     }
