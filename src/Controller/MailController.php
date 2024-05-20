@@ -37,9 +37,9 @@ class MailController extends AbstractController
     }
 
     #[Route('/mailWelcome', name: 'mailWelcome')]
-    public function sendWelcomeEmail(Request $request): Response
+    public function sendWelcomeEmail(string $username): Response
     {
-        $this->emailFacade->sendWelcomeEmail($request);
+        $this->emailFacade->sendWelcomeEmail($username);
         return new Response('Welcome email sent successfully');
     }
 }
