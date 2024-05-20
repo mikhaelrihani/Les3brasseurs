@@ -1,27 +1,32 @@
 <?php
 namespace App\Service;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use App\Entity\Email;
 
 class EmailFacade
 {
     private $mailerService;
-    private $request;
+    private $requestStack;
 
-    public function __construct(MailerService $mailerService, Request $request)
+    public function __construct(MailerService $mailerService, RequestStack $requestStack)
     {
         $this->mailerService = $mailerService;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
   
 
     public function sendWelcomeEmail(string $username): void
     {
-        // Récupérer les données de l'email depuis la requête
+        // Récupérer la requête actuelle
+        $request = $this->requestStack->getCurrentRequest();
 
-        $to = $this->request->request->get('to');
-        $username = $this->request->request->get('username');
+        if (!$request) {
+            throw new \RuntimeException('No current request available');
+        }
+
+        // Récupérer les données de l'email depuis la requête
+        $to = $request->request->get('to');
         $subject = 'Welcome to MyApp';
         $body = 'Thank you for registering, ' . htmlspecialchars($username);
 

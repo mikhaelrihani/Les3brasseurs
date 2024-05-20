@@ -4,25 +4,33 @@ namespace App\Service;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use App\Entity\Email as EmailData;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MailerService
 {
-
     private $from;
     private $mailer;
     private $validator;
+    private $requestStack;
 
-    public function __construct(MailerInterface $mailer, ValidatorInterface $validator, string $from)
+    public function __construct(MailerInterface $mailer, ValidatorInterface $validator, string $from, RequestStack $requestStack)
     {
         $this->mailer = $mailer;
         $this->validator = $validator;
         $this->from = $from;
+        $this->requestStack = $requestStack;
     }
 
-    public function sendEmailFromRequest(Request $request): void
+    public function sendEmailFromRequest(): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request) {
+            throw new \RuntimeException('No current request available');
+        }
+
+        // Récupérer les données de l'email depuis la requête
         $to = $request->request->get('to');
         $subject = $request->request->get('subject');
         $body = $request->request->get('body');
