@@ -17,6 +17,7 @@
         "fakerphp/faker": "^1.23",
         "imagekit/imagekit": "*",
         "phpdocumentor/reflection-docblock": "^5.4",
+        "phpoffice/phpspreadsheet": "^2.1",
         "phpseclib/phpseclib": "~3.0",
         "phpstan/phpdoc-parser": "^1.28",
         "ramsey/uuid": "*",

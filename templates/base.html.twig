@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>
+			{% block title %}Welcome!
+			{% endblock %}
+		</title>
+		<link rel="stylesheet" href="{{ asset('css/app.css') }}"> {% block stylesheets %}{% endblock %}
+		</head>
+		<body>
+			<header>
+				<nav>
+					<ul>
+						<li><a href="{{ path('upload_excel') }}">Upload Excel</a></li>
+						<li><a href="{{ path('update_excel') }}">Update Excel</a></li>
+					</ul>
+				</nav>
+			</header>
+
+			<main role="main" class="container"> {% block body %}{% endblock %}
+				</main>
+
+				<footer>
+					<p>&copy;
+						{{ "now"|date("Y") }}
+						Omika</p>
+				</footer>
+
+				<script src="{{ asset('js/app.js') }}"></script>
+				{% block javascripts %}{% endblock %}
+			</body>
+		</html>

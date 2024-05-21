@@ -1,8 +1,9 @@
 <?php
-namespace App\Controller;
+namespace App\Controller\Api\Media;
 
 use App\Service\EmailFacadeService;
 use App\Service\MailerService;
+use App\Controller\MainController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 //! modele a utiliser dans d autre controller
 #[Route('/api/mails')]
-class MailController extends MainController
+class EmailController extends MainController
 {
     private EmailFacadeService $emailFacade;
     private MailerService $mailerService;

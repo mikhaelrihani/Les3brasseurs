@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Excel File View{% endblock %}
+
+{% block body %}
+    <h1>Excel File Content</h1>
+    <form id="excel-form">
+        <table border="1">
+            {% for rowIndex, row in data %}
+                <tr>
+                    {% for colIndex, cell in row %}
+                        <td contenteditable="true" data-row="{{ rowIndex }}" data-col="{{ colIndex }}">{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <input type="hidden" name="fileName" value="{{ fileName }}">
+        <button type="submit">Save Changes</button>
+    </form>
+    <a href="{{ path('modify_excel', {'fileName': fileName}) }}" class="btn btn-primary">Download Modified Excel</a>
+
+    <script>
+        document.getElementById('excel-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const table = document.querySelector('table');
+            const data = [];
+            for (let row of table.rows) {
+                const rowData = [];
+                for (let cell of row.cells) {
+                    rowData.push(cell.innerText);
+                }
+                data.push(rowData);
+            }
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(data));
+            formData.append('fileName', document.querySelector('input[name="fileName"]').value);
+
+            fetch('/update?fileName=' + encodeURIComponent(document.querySelector('input[name="fileName"]').value), {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'modified_' + document.querySelector('input[name="fileName"]').value;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+{% endblock %}

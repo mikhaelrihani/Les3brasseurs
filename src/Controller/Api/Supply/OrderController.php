@@ -57,7 +57,7 @@ class OrderController extends MainController
     {
         $queryParams = $request->query->all();
         $queryBuilder = $orderRepository->createQueryBuilder('o');
-       
+
         if (empty($queryParams)) {
             return $this->json(["error" => "No query parameter provided"], Response::HTTP_BAD_REQUEST);
         }
@@ -80,7 +80,7 @@ class OrderController extends MainController
         }
         // Exécuter la requête
         $orders = $queryBuilder->getQuery()->getResult();
-        
+
         if (empty($orders)) {
             return $this->json(["error" => "No orders found for the provided query parameters"], Response::HTTP_NOT_FOUND);
         }
@@ -90,7 +90,7 @@ class OrderController extends MainController
 
 
     //! POST ORDER
-
+    //! create order, create xcell or pdf(service), send email notification
     #[Route('/post', name: 'app_api_supplier_postSuppplier', methods: 'POST')]
     public function postSuppplier(
         Request $request,
