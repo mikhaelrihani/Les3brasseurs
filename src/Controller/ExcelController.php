@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Form\UploadFormType;
 use App\Form\SelectFileType;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +30,7 @@ class ExcelController extends AbstractController
 
             if ($file) {
                 $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                $fileName = $originalFileName. "." . $file->guessExtension();
+                $fileName = $originalFileName . "." . $file->guessExtension();
 
                 try {
                     $file->move(
@@ -130,39 +131,44 @@ class ExcelController extends AbstractController
     {
         $data = json_decode($request->request->get('data'), true);
         $fileName = $request->request->get('fileName');
-        // // Récupérer le nom de fichier sans extension
-        // $originalFileName = pathinfo($fileName, PATHINFO_FILENAME);
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/upload/' . $fileName;
 
-        // // Générer le nom du fichier modifié
-        // $modifiedFileName = 'modified_' . $originalFileName . '.xlsx';
+        // Désactiver le calcul automatique des formules
+        \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance()->setCalculationCacheEnabled(false);
 
-        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $fileName;
+       // Log the received data for debugging
+    error_log("Received data: " . print_r($data, true));
+    error_log("File name: " . $fileName);
 
+    try {
         $spreadsheet = IOFactory::load($filePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        // foreach ($data as $rowIndex => $row) {
-        //     foreach ($row as $colIndex => $cellValue) {
-        //         $sheet->setCellValueByColumnAndRow($colIndex + 1, $rowIndex + 1, $cellValue);
-        //     }
-        // }
+        // Apply the received data to the spreadsheet
         foreach ($data as $rowIndex => $row) {
             foreach ($row as $colIndex => $cellValue) {
                 $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
                 $cellCoordinate = $columnLetter . ($rowIndex + 1);
-                $sheet->setCellValue($cellCoordinate, $cellValue);
+                
+                // Log the cell values for debugging
+                error_log("Setting cell $cellCoordinate with value: $cellValue");
+
+                if (is_string($cellValue) && strpos($cellValue, '=') === 0) {
+                    $sheet->setCellValue($cellCoordinate, $cellValue);
+                } else {
+                    $sheet->setCellValueExplicit($cellCoordinate, $cellValue, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                }
             }
         }
 
         $writer = new Xlsx($spreadsheet);
-
         $response = new StreamedResponse(function () use ($writer) {
             $writer->save('php://output');
         });
 
         $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $fileName
+            'modified_' . $fileName
         );
 
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -170,5 +176,9 @@ class ExcelController extends AbstractController
         $response->headers->set('Cache-Control', 'max-age=0');
 
         return $response;
+    } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+        error_log("Error processing the spreadsheet: " . $e->getMessage());
+        return new Response("Error processing the spreadsheet: " . $e->getMessage(), 500);
+    }
     }
 }
