@@ -4,8 +4,7 @@ namespace App\Service;
 use App\Entity\File;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use finfo;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 
 class FileService
 {

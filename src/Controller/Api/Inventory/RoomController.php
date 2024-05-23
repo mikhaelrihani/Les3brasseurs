@@ -2,10 +2,10 @@
 
 namespace App\Controller\Api\Inventory;
 
+use App\Controller\MainController;
 use App\Entity\Room;
 use App\Repository\RoomRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 
 #[Route('/api/rooms')]
-class RoomApiController extends AbstractController
+class RoomController extends MainController
 {
     private $entityManager;
 

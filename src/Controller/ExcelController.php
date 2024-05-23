@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use App\Form\UploadFormType;
 use App\Form\SelectFileType;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use App\Service\MailerService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,7 +18,18 @@ use Symfony\Component\Finder\Finder;
 #[Route("excel")]
 class ExcelController extends AbstractController
 {
+    private MailerService $mailerService;
+    public function __construct(MailerService $mailerService)
+    {
+        $this->mailerService = $mailerService;
 
+    }
+    #[Route("/send-email", name: "send_email")]
+    public function sendEmail(): Response
+    {
+        $this->mailerService->sendEmail("mikabernikdev@gmail.com","subject","body");
+        return new Response('Email sent');
+    }
     #[Route("/upload", name: "upload_excel")]
     public function upload(Request $request): Response
     {
@@ -136,49 +147,49 @@ class ExcelController extends AbstractController
         // Désactiver le calcul automatique des formules
         \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance()->setCalculationCacheEnabled(false);
 
-       // Log the received data for debugging
-    error_log("Received data: " . print_r($data, true));
-    error_log("File name: " . $fileName);
+        // Log the received data for debugging
+        error_log("Received data: " . print_r($data, true));
+        error_log("File name: " . $fileName);
 
-    try {
-        $spreadsheet = IOFactory::load($filePath);
-        $sheet = $spreadsheet->getActiveSheet();
+        try {
+            $spreadsheet = IOFactory::load($filePath);
+            $sheet = $spreadsheet->getActiveSheet();
 
-        // Apply the received data to the spreadsheet
-        foreach ($data as $rowIndex => $row) {
-            foreach ($row as $colIndex => $cellValue) {
-                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
-                $cellCoordinate = $columnLetter . ($rowIndex + 1);
-                
-                // Log the cell values for debugging
-                error_log("Setting cell $cellCoordinate with value: $cellValue");
+            // Apply the received data to the spreadsheet
+            foreach ($data as $rowIndex => $row) {
+                foreach ($row as $colIndex => $cellValue) {
+                    $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+                    $cellCoordinate = $columnLetter . ($rowIndex + 1);
 
-                if (is_string($cellValue) && strpos($cellValue, '=') === 0) {
-                    $sheet->setCellValue($cellCoordinate, $cellValue);
-                } else {
-                    $sheet->setCellValueExplicit($cellCoordinate, $cellValue, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    // Log the cell values for debugging
+                    error_log("Setting cell $cellCoordinate with value: $cellValue");
+
+                    if (is_string($cellValue) && strpos($cellValue, '=') === 0) {
+                        $sheet->setCellValue($cellCoordinate, $cellValue);
+                    } else {
+                        $sheet->setCellValueExplicit($cellCoordinate, $cellValue, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    }
                 }
             }
+
+            $writer = new Xlsx($spreadsheet);
+            $response = new StreamedResponse(function () use ($writer) {
+                $writer->save('php://output');
+            });
+
+            $dispositionHeader = $response->headers->makeDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                'modified_' . $fileName
+            );
+
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', $dispositionHeader);
+            $response->headers->set('Cache-Control', 'max-age=0');
+
+            return $response;
+        } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+            error_log("Error processing the spreadsheet: " . $e->getMessage());
+            return new Response("Error processing the spreadsheet: " . $e->getMessage(), 500);
         }
-
-        $writer = new Xlsx($spreadsheet);
-        $response = new StreamedResponse(function () use ($writer) {
-            $writer->save('php://output');
-        });
-
-        $dispositionHeader = $response->headers->makeDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            'modified_' . $fileName
-        );
-
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', $dispositionHeader);
-        $response->headers->set('Cache-Control', 'max-age=0');
-
-        return $response;
-    } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
-        error_log("Error processing the spreadsheet: " . $e->getMessage());
-        return new Response("Error processing the spreadsheet: " . $e->getMessage(), 500);
-    }
     }
 }
