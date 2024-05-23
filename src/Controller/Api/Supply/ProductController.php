@@ -20,7 +20,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
-
+/**
+ * TODO: ADD road to get a list of all products per room and per supplier to gain speed on databse queries
+ */
 #[Route('/api/products')]
 class ProductController extends MainController
 {

@@ -7,6 +7,9 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class SpreadsheetService
 {
+    /**
+    * TODO: AJOUTER UN PDF TO EXCEL
+    */
     public function generateExcel(): Response
     {
         // Exemple de récupération des données depuis la base de données

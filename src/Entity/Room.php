@@ -38,9 +38,15 @@ class Room
     #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'rooms')]
     private Collection $products;
 
+     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Inventory", mappedBy="room")
+     */
+    private $inventories;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->inventories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -82,6 +88,14 @@ class Room
         $this->updated_at = $updated_at;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getInventories(): Collection
+    {
+        return $this->inventories;
     }
 
     /**

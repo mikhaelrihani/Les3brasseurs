@@ -23,6 +23,7 @@ class Inventory
     #[ORM\JoinColumn(nullable: false)]
     private ?Date $date = null;
 
+    //! supprimer cette propriete
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     private ?string $status = null;
@@ -39,7 +40,8 @@ class Inventory
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?file $file = null;
-
+    //! ajouter excelPATHFILE = null qd initialise 
+    //! originalexcelfile PLUTOT QUE FILE 
     public function getId(): ?int
     {
         return $this->id;
