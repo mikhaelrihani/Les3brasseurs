@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity('email')]
 #[UniqueEntity('phone')]
 #[UniqueEntity('whatsApp')]
-class UserInfos
+class UserInfos implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -48,21 +50,28 @@ class UserInfos
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\OneToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
-    #[Groups(["userWithoutRelation","userWithRelation"])]
+    #[Groups(["userWithoutRelation", "userWithRelation"])]
     private ?User $user = null;
 
-    #[ORM\Column(unique: true,length: 255)]
+    #[ORM\Column(unique: true, length: 255)]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     #[Assert\NotBlank]
-    #[Groups(["userWithRelation","supplyWithRelation"])]
+    #[Groups(["userWithRelation", "supplyWithRelation"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(["userWithRelation","supplyWithRelation"])]
+    #[Groups(["userWithRelation", "supplyWithRelation"])]
     private ?string $job = null;
+
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
+    #[Groups(["userWithoutRelation", "userWithRelation", "supplyWithRelation"])]
+    private array $roles = [];
 
     /**
      * @var Collection<int, group>
@@ -70,7 +79,7 @@ class UserInfos
     #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'userInfos')]
     #[Groups(["userWithRelation"])]
     private Collection $groupList;
-    
+
 
     public function __construct()
     {
@@ -190,6 +199,28 @@ class UserInfos
 
         return $this;
     }
+    /**
+     * @see UserInterface
+     * @return list<string>
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, group>
@@ -214,5 +245,45 @@ class UserInfos
 
         return $this;
     }
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+    public function getSalt(): ?string
+    {
+        // Retournez le sel si nécessaire, sinon null
+        return null;
+    }
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
 
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
 }
