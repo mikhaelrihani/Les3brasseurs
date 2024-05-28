@@ -32,7 +32,8 @@ services:
             $requestStack: '@request_stack'
     App\Service\EmailFacadeService:
         arguments:
-            $requestStack: '@request_stack'       
+            $requestStack: '@request_stack' 
+              
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

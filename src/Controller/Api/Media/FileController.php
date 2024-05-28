@@ -78,13 +78,8 @@ class FileController extends MainController
         $this->fileService->postDb($doctype, $remoteFilePath, $fileName);
 
         // envoyer un email de confirmation pour le fichier téléversé
-        // $this->mailerService->sendMail("contact@omika.fr", "hello subject");
-
-        // $dsn = $_ENV[ 'MAILER_DSN' ];
-        // $dsn = Dsn::fromString($dsn);
-        //  dd($dsn->getUser(), $dsn->getPassword(), $dsn->getHost(), $dsn->getPort());
-
-
+        $sentMessage = $this->mailerService->sendEmail("contact@omika.fr", "hello subject", "im the body");
+   
         return new JsonResponse([
             'message' => 'File uploaded successfully'
         ]);

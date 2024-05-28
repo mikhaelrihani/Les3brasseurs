@@ -1,21 +1,24 @@
 <?php
 namespace App\Service;
 
-use Symfony\Component\Mailer\MailerInterface;
+use Exception;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailerService
 {
-    
+
     private $from;
     private $mailer;
 
     private $requestStack;
 
-    public function __construct(MailerInterface $mailer, string $from, RequestStack $requestStack)
+    public function __construct(TransportInterface $transport, string $from, RequestStack $requestStack)
     {
-        $this->mailer = $mailer;
+        $this->mailer = $transport;
         $this->from = $from;
         $this->requestStack = $requestStack;
     }
@@ -36,7 +39,7 @@ class MailerService
     }
 
 
-    public function sendEmail(string $to, string $subject, string $body): void
+    public function sendEmail(string $to, string $subject, string $body): ?SentMessage
     {
         $email = (new Email())
             ->from($this->from)
@@ -44,6 +47,11 @@ class MailerService
             ->subject($subject)
             ->html($body);
 
-        $this->mailer->send($email);
+        try {
+            return $this->mailer->send($email);
+        } catch (TransportExceptionInterface $e) {
+            throw new Exception('Failed to send email: ' . $e->getMessage());
+        }
+
     }
 }
