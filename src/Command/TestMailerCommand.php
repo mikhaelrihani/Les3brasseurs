@@ -6,6 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 
 
@@ -20,7 +21,7 @@ class TestMailerCommand extends Command
   
     private $mailer;
 
-    public function __construct(MailerInterface $mailer)
+    public function __construct(TransportInterface $mailer)
     {
         parent::__construct();
         $this->mailer = $mailer;
@@ -37,8 +38,8 @@ class TestMailerCommand extends Command
         $email = (new Email())
             ->from('contact@omika.fr')
             ->to('contact@omika.fr')
-            ->subject('Test Email again');
-            // ->text('This is a test email.');
+            ->subject('Test Email again')
+            ->text('This is a test email.');
 
         try {
             $this->mailer->send($email);
