@@ -20,7 +20,7 @@ class EmailFacadeService
         if (!$request) {
             throw new \RuntimeException('No current request available');
         }
-
+        //$to = "mikabernik@gmail.com";
         $to = $request->request->get('to');
         $subject = 'Welcome to Omika';
         $body = 'Thank you for registering, ' . $username . '!';

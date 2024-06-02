@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 
-
 //! modele a utiliser dans d autre controller
 #[Route('/api/mails')]
 class EmailController extends MainController
