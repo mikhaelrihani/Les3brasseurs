@@ -4,7 +4,13 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    upload_directory: '%kernel.project_dir%/public/upload'
+    $fileUploadDirectory: '%env(FILE_UPLOAD_DIRECTORY)%'
+    $fileDownloadDirectory: '%env(FILE_DOWNLOAD_DIRECTORY)%'
+    app.twilio_from_number: '%env(TWILIO_FROM_NUMBER)%'
+    app.admin_phone_number: '%env(APP_ADMIN_PHONE_NUMBER)%'
+   
+
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -33,7 +39,11 @@ services:
     App\Service\EmailFacadeService:
         arguments:
             $requestStack: '@request_stack' 
-              
+    Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport:
+        arguments:
+            $accountSid: '%env(TWILIO_ACCOUNT_SID)%'
+            $authToken: '%env(TWILIO_AUTH_TOKEN)%'
+            $from: '%env(TWILIO_FROM_NUMBER)%'          
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
