@@ -42,7 +42,7 @@ class FileController extends MainController
     }
 
 
-    //! UPLOAD FILE
+    //! UPLOAD FILE in separate directory of application
     #[Route('/upload', name: 'app_api_file_upload', methods: ['POST'])]
     public function upload(Request $request): JsonResponse
     {
@@ -73,12 +73,12 @@ class FileController extends MainController
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        //  Ajouter le fichier à la base de données
+        //  Ajouter le path du fichier à la base de données
 
         $this->fileService->postDb($doctype, $remoteFilePath, $fileName);
 
         // envoyer un email de confirmation pour le fichier téléversé
-        $sentMessage = $this->mailerService->sendEmail("contact@omika.fr", "hello subject", "im the body");
+        $sentMessage = $this->mailerService->sendEmail("contact@omika.fr", "file uploaded with success to omika server", "im the file body");
    
         return new JsonResponse([
             'message' => 'File uploaded successfully'

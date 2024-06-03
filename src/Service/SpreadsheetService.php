@@ -2,18 +2,22 @@
 
 namespace App\Service;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SpreadsheetService
 {
     /**
     * TODO: AJOUTER UN PDF TO EXCEL
     */
-    public function generateExcel(): Response
+    public function generateExcel(EntityManagerInterface $em): Response
     {
         // Exemple de récupération des données depuis la base de données
-        $repository = $this->entityManager->getRepository(User::class);
+        $repository = $em->getRepository(User::class);
         $users = $repository->findAll();
 
         // Créer un nouveau fichier Spreadsheet

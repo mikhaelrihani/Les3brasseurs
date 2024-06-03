@@ -12,7 +12,7 @@ class UploadService
         private SluggerInterface $slugger,
     ) {
     }
-
+    //! UPLOAD FILE in directory of application
     public function upload(UploadedFile $file): string
     {
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);

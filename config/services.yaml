@@ -8,6 +8,7 @@ parameters:
     $fileDownloadDirectory: '%env(FILE_DOWNLOAD_DIRECTORY)%'
     app.twilio_from_number: '%env(TWILIO_FROM_NUMBER)%'
     app.admin_phone_number: '%env(APP_ADMIN_PHONE_NUMBER)%'
+    upload_directory: '%kernel.project_dir%/public/uploads'
    
 
 

@@ -69,6 +69,7 @@ class RoomController extends MainController
         }
 
         // Vérifier s'il y a des inventaires ou des produits associés
+        //! ou proposer de supprimer toutes les references ou preventivement modifier la room de chacun des produits , inventaires(meme si c'est sauve en pdf)
         if (!$room->getInventories()->isEmpty() || !$room->getProducts()->isEmpty()) {
             return new JsonResponse(['message' => 'Room cannot be deleted, it has associated inventories or products'], Response::HTTP_BAD_REQUEST);
         }
