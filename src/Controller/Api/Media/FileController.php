@@ -8,6 +8,7 @@ use App\Service\FileService;
 use App\Service\MailerService;
 use App\Service\PhpseclibService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -79,11 +80,37 @@ class FileController extends MainController
 
         // envoyer un email de confirmation pour le fichier téléversé
         $sentMessage = $this->mailerService->sendEmail("contact@omika.fr", "file uploaded with success to omika server", "im the file body");
-   
+
         return new JsonResponse([
             'message' => 'File uploaded successfully'
         ]);
     }
+    
+    //! UPLOAD FILE in public directory of application
+    #[Route('/uploadPublic', name: 'app_api_file_uploadPublic', methods: ['POST'])]
+    public function uploadPublic(Request $request): JsonResponse
+    {
+        $file = $request->files->get('file');
+
+        if (!$file) {
+            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $uploadDirectory = $this->getParameter('upload_directory');
+        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $newFilename = uniqid() . '-' . $originalFilename . '.' . $file->guessExtension();
+
+        try {
+            $file->move($uploadDirectory, $newFilename);
+        } catch (FileException $e) {
+            return new JsonResponse(['error' => 'Failed to upload file'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $publicPath = $this->getParameter('public_path') . '/upload/' . $newFilename;
+
+        return new JsonResponse(['url' => $publicPath], Response::HTTP_OK);
+    }
+
 
     //! Download FILE
 

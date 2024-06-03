@@ -8,7 +8,8 @@ parameters:
     $fileDownloadDirectory: '%env(FILE_DOWNLOAD_DIRECTORY)%'
     app.twilio_from_number: '%env(TWILIO_FROM_NUMBER)%'
     app.admin_phone_number: '%env(APP_ADMIN_PHONE_NUMBER)%'
-    upload_directory: '%kernel.project_dir%/public/uploads'
+    upload_directory: '%kernel.project_dir%/public/upload'
+    public_path: '%env(resolve:APP_URL)%'
    
 
 
@@ -44,7 +45,12 @@ services:
         arguments:
             $accountSid: '%env(TWILIO_ACCOUNT_SID)%'
             $authToken: '%env(TWILIO_AUTH_TOKEN)%'
-            $from: '%env(TWILIO_FROM_NUMBER)%'          
+            $from: '%env(TWILIO_FROM_NUMBER)%' 
+    App\Service\TwilioService:
+        arguments:
+            $accountSid: '%env(TWILIO_ACCOUNT_SID)%'
+            $authToken: '%env(TWILIO_AUTH_TOKEN)%'
+            $from: '%env(TWILIO_FROM_NUMBER)%'                 
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

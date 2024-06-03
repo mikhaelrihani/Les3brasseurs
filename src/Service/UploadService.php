@@ -1,7 +1,9 @@
 <?php
 namespace App\Service;
 
+
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -22,9 +24,8 @@ class UploadService
         try {
             $file->move($this->getTargetDirectory(), $fileName);
         } catch (FileException $e) {
-            // ... handle exception if something happens during file upload
+            throw new FileException($e->getMessage());
         }
-
         return $fileName;
     }
 

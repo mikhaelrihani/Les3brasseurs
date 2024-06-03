@@ -5,27 +5,30 @@ use Twilio\Rest\Client;
 
 class TwilioService
 {
-   
-    private $authToken ='%env(TWILIO_AUTH_TOKEN)%';
-    private $accountSid= '%env(TWILIO_ACCOUNT_SID)%';
-    private $from = '%env(TWILIO_FROM_NUMBER)%';    
+    private $from;
+    private $client;
+
+    public function __construct(string $accountSid, string $authToken, string $from)
+    {
+        $this->from = $from;
+        
+        $this->client = new Client($accountSid, $authToken);
+    }
 
     public function sendMms(string $to, string $body, string $mediaUrl): string
     {
-        $client = new Client($this->accountSid, $this->authToken);
         try {
-           $mms =  $client->messages->create(
+            $message = $this->client->messages->create(
                 $to,
                 [
                     'from' => $this->from,
                     'body' => $body,
-                    'mediaUrl' => $mediaUrl
+                    'mediaUrl' => [$mediaUrl]
                 ]
             );
-            
+            return $message; 
         } catch (\Exception $e) {
             throw new \Exception("Error sending MMS: " . $e->getMessage());
         }
-       return  $mms;
     }
 }

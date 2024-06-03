@@ -20,26 +20,28 @@ class NotificationController extends MainController
     private $texter;
     private $twilioService;
 
-    public function __construct(ParameterBagInterface $params, TwilioTransport $twilioTransport, TexterInterface $texter, TwilioService $twilioService)
-    {
+    public function __construct(
+        ParameterBagInterface $params,
+        TwilioTransport $twilioTransport,
+        TexterInterface $texter,
+        TwilioService $twilioService
+    ) {
         $this->params = $params;
         $this->twilioTransport = $twilioTransport;
         $this->texter = $texter;
         $this->twilioService = $twilioService;
     }
 
-    #[Route(path: '/send-sms', name: 'send_sms')]
+    #[Route('/send-sms', name: 'send_sms', methods: ['POST'])]
+    
     public function sendSms(Request $request): Response
     {
-        dd("hey");
         $from = $this->params->get('app.twilio_from_number');
         $to = $request->request->get('to');
         $body = $request->request->get('body');
 
         try {
-            $to = $this->params->get('app.admin_phone_number');
-            $body = 'Omika is back on track!';
-
+           
             $sms = new SmsMessage(
                 $to,
                 $body,
@@ -58,7 +60,7 @@ class NotificationController extends MainController
         }
     }
 
-    #[Route(path: '/send-mms', name: 'send_mms', methods: "POST")]
+    #[Route('/send-mms', name: 'send_mms', methods: "POST")]
     public function sendMms(Request $request): Response
     {
         $to = $request->request->get('to');
