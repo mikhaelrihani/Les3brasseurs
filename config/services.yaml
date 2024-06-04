@@ -32,8 +32,11 @@ services:
             $targetDirectory: '%upload_directory%'
     App\Service\PhpseclibService:
         arguments:
-            $fileUploadDirectory: '%env(FILE_UPLOAD_DIRECTORY)%'
             $fileDownloadDirectory: '%env(FILE_DOWNLOAD_DIRECTORY)%'
+            $host: '%env(SFTP_HOST)%'
+            $username: '%env(SFTP_USERNAME)%'
+            $password: '%env(SFTP_PASSWORD)%'
+            $remoteDirectory: '%env(SFTP_REMOTE_DIRECTORY)%'
     App\Service\MailerService:
         arguments:
             $from: '%env(string:SENDER)%'

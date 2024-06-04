@@ -7,62 +7,50 @@ use phpseclib3\Net\SFTP;
 
 class PhpseclibService
 {
-    protected $fileUploadDirectory;
+    protected $remoteDirectory;
     protected $fileDownloadDirectory;
+    protected $sftp;
 
-    public function __construct($fileUploadDirectory,$fileDownloadDirectory)
+
+    public function __construct(string $fileDownloadDirectory, string $host, string $username, string $password, string $remoteDirectory)
     {
-        $this->fileUploadDirectory = $fileUploadDirectory;
-        $this->fileDownloadDirectory = $fileDownloadDirectory;
-    }
-    public function authenticate()
-    {
-        $host = '193.203.191.6';
-        $port = 22;
-        $username = 'root';
-        $password = 'Rihani29!';
-        $sftp = $this->connectSFTP($host, $port, $username, $password);
-        return $sftp ;
-    }
-    public function connectSFTP($host, $port, $username, $password)
-    {
-        $sftp = new SFTP($host, $port);
-        if (!$sftp->login($username, $password)) {
-            throw new \Exception("Login failed");
+        $this->sftp = new SFTP($host);
+        if (!$this->sftp->login($username, $password)) {
+            throw new \Exception('Login failed');
         }
-        return $sftp;
+        $this->remoteDirectory = $remoteDirectory;
+        $this->fileDownloadDirectory = $fileDownloadDirectory;
+
     }
 
-    public function uploadFile($sftp, $localFile, $remoteFile)
+    public function uploadFile($localFile, $remoteFile)
     {
-        if (!$sftp->put($remoteFile, $localFile, SFTP::SOURCE_LOCAL_FILE)) {
+        if (!$this->sftp->put($remoteFile, $localFile, SFTP::SOURCE_LOCAL_FILE)) {
             throw new \Exception("Upload failed");
         }
     }
 
-    public function downloadFile($sftp, $remoteFile, $localFile)
+    public function downloadFile($remoteFile, $localFile)
     {
-        if (!$sftp->get($remoteFile, $localFile)) {
+        if (!$this->sftp->get($remoteFile, $localFile)) {
             throw new \Exception("Download failed");
         }
-       
     }
 
-    public function listFiles($sftp, $directory)
+    public function listFiles(): array
     {
-        $files = $sftp->nlist($directory);
-        return $files;
+        return $this->sftp->nlist($this->remoteDirectory);
     }
 
-    public function deleteFile($sftp, $file)
+    public function deleteFile($file)
     {
-        if (!$sftp->delete($file)) {
+        if (!$this->sftp->delete($file)) {
             throw new \Exception("Delete failed");
         }
     }
     public function getFileUploadDirectory()
     {
-        return $this->fileUploadDirectory;
+        return $this->remoteDirectory;
     }
     public function getFileDownloadDirectory()
     {
