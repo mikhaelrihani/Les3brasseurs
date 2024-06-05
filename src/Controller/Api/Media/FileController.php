@@ -8,6 +8,8 @@ use App\Service\FileService;
 use App\Service\MailerService;
 use App\Service\PhpseclibService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,12 +24,15 @@ class FileController extends MainController
     private PhpseclibService $phpseclibService;
     private FileService $fileService;
     private MailerService $mailerService;
+    private ParameterBagInterface $params;
 
-    function __construct(PhpseclibService $phpseclibService, FileService $fileService, MailerService $mailerService)
+
+    function __construct(PhpseclibService $phpseclibService, FileService $fileService, MailerService $mailerService,ParameterBagInterface $params)
     {
         $this->phpseclibService = $phpseclibService;
         $this->fileService = $fileService;
         $this->mailerService = $mailerService;
+        $this->params = $params;
     }
 
     //! GET FILE 
@@ -43,15 +48,30 @@ class FileController extends MainController
 
     }
 
-    //! GET FILES EXPLORER
-
-    #[Route('/explorer', name: 'app_api_file_getFilesExplorer', methods: ['GET'])]
-    public function getFilesExplorer(): JsonResponse
+    //! GET FILES EXPLORER view
+    #[Route('/explorer', name: 'app_file_explorer', methods: ['GET'])]
+    public function getFilesExplorer(): Response
     {
-        $files = $this->phpseclibService->listFiles();
-        return new JsonResponse(['files' => $files], Response::HTTP_OK);
+        return $this->render('explorer.html.twig');
     }
 
+    //! GET FILES EXPLORER data
+    #[Route('/explorer-data', name: 'app_file_explorer_data', methods: ['GET'])]
+    public function getFilesExplorerData(): JsonResponse
+    {
+        $files = $this->phpseclibService->listFiles();
+    
+        $basePath = $this->params->get('fileUploadDirectory');
+        $fileData = array_map(function($file) use ($basePath) {
+            return [
+                'name' => basename($file),
+                'path' => $basePath . '/' . $file
+            ];
+        }, $files);
+    
+        return new JsonResponse(['files' => $fileData], Response::HTTP_OK);
+    }
+    
     //! UPLOAD FILE in external directory of application
     #[Route('/upload', name: 'app_api_file_upload', methods: ['POST'])]
     public function upload(Request $request): JsonResponse
@@ -128,7 +148,7 @@ class FileController extends MainController
             return new JsonResponse(['error' => 'location not found'], Response::HTTP_BAD_REQUEST);
 
         // Récupérer le path et nom du fichier à télécharger 
-        $data = json_decode($request->getContent(), true);
+        $data = $request->toArray();
         $fileExternalPath = $data[ 'fileExternalPath' ];
         $fileName = $data[ 'fileName' ];
 
@@ -136,20 +156,27 @@ class FileController extends MainController
             return new JsonResponse(['error' => 'fileExternalPath or fileName not found'], Response::HTTP_BAD_REQUEST);
 
         // Télécharger le fichier dans public directory
-        $filePublicPath = $_ENV[ 'FILE_DOWNLOAD_DIRECTORY' ] . "\\" . $fileName;
+        $filePublicPath = $_ENV[ 'FILE_DOWNLOAD_DIRECTORY' ] . DIRECTORY_SEPARATOR . $fileName;
         try {
             $this->phpseclibService->downloadFile($fileExternalPath, $filePublicPath);
+
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
+        if (!file_exists($filePublicPath)) {
+            return new JsonResponse(['error' => 'File not found after download'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
         // Retourner le fichier téléchargé ou le chemin du fichier téléchargé
         if ($location == 'public') {
             return $this->file($filePublicPath);
         }
-        $response = new Response(file_get_contents($filePublicPath));
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
-        return $response;
+        // $response = new Response(file_get_contents($filePublicPath));
+        // $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+        // $response->headers->set('Content-Type', mime_content_type($filePublicPath));
+        // $response->headers->set('Content-Length', filesize($filePublicPath));
+        // return $response;
+
+        return new BinaryFileResponse($filePublicPath);
     }
 
     //! DELETE FILE
