@@ -48,11 +48,11 @@ class FileController extends MainController
 
     }
 
-    //! GET FILES EXPLORER view
-    #[Route('/explorer', name: 'app_file_explorer', methods: ['GET'])]
-    public function getFilesExplorer(): Response
+    //! GET Form to send MMS
+    #[Route('/sendMms', name: 'app_file_sendMms', methods: ['GET'])]
+    public function getFilesExplorerMms(): Response
     {
-        return $this->render('explorer.html.twig');
+        return $this->render('sendMms.html.twig');
     }
 
     //! GET FILES EXPLORER data
@@ -68,7 +68,7 @@ class FileController extends MainController
                 'path' => $basePath . '/' . $file
             ];
         }, $files);
-    
+   
         return new JsonResponse(['files' => $fileData], Response::HTTP_OK);
     }
     

@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ExplorerModal{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>Send MMS</h1>
+    <form id="mmsForm">
+        <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" id="phoneNumber" name="to" required>
+        </div>
+        <div class="mb-3">
+            <label for="messageBody" class="form-label">Message</label>
+            <textarea class="form-control" id="messageBody" name="body" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="selectedFile" class="form-label">Selected File</label>
+            <input type="text" class="form-control" id="selectedFile" name="file" readonly required>
+        </div>
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#fileModal">Choose File</button>
+        <button type="button" class="btn btn-primary" id="sendMmsBtn">Send MMS</button>
+    </form>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Select a File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Local Files</h6>
+                        <input type="file" class="form-control" id="fileInput">
+                    </div>
+                    <div class="col-md-6">
+                        <h6>External Storage</h6>
+                        <div id="file-explorer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="selectFileBtn">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch('{{ path("app_file_explorer_data") }}');
+        const data = await response.json();
+        const fileExplorer = document.getElementById('file-explorer');
+
+        data.files.forEach(file => {
+            const fileElement = document.createElement('div');
+            fileElement.textContent = file.name;
+            fileElement.dataset.filePath = file.path;
+            fileElement.dataset.fileName = file.name;
+            fileElement.dataset.fileSize = file.size;
+            fileElement.dataset.fileType = file.type;
+
+            fileElement.addEventListener('click', () => {
+                document.querySelectorAll('#file-explorer div').forEach(div => div.classList.remove('selected'));
+                fileElement.classList.add('selected');
+                document.getElementById('fileInput').value = '';
+            });
+            fileExplorer.appendChild(fileElement);
+        });
+
+        document.getElementById('selectFileBtn').addEventListener('click', () => {
+            const selectedExternalFile = document.querySelector('#file-explorer div.selected');
+            const fileInput = document.getElementById('fileInput');
+            const selectedFileInput = fileInput.files[0];
+
+            if (selectedExternalFile) {
+                document.getElementById('selectedFile').value = JSON.stringify({
+                    path: selectedExternalFile.dataset.filePath,
+                    name: selectedExternalFile.dataset.fileName,
+                    size: selectedExternalFile.dataset.fileSize,
+                    type: selectedExternalFile.dataset.fileType
+                });
+            } else if (selectedFileInput) {
+                document.getElementById('selectedFile').value = JSON.stringify({
+                    name: selectedFileInput.name,
+                    size: selectedFileInput.size,
+                    type: selectedFileInput.type
+                });
+            } else {
+                alert('Please select a file.');
+                return;
+            }
+
+            const modal = document.getElementById('fileModal');
+            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
+        });
+
+        document.getElementById('sendMmsBtn').addEventListener('click', async () => {
+            const to = document.getElementById('phoneNumber').value;
+            const body = document.getElementById('messageBody').value;
+            const file = JSON.parse(document.getElementById('selectedFile').value);
+
+            const formData = new FormData();
+            formData.append('to', to);
+            formData.append('body', body);
+
+            // Append local file if selected
+            if (document.getElementById('fileInput').files[0]) {
+                formData.append('file', document.getElementById('fileInput').files[0]);
+            } else {
+                // For external files, assume file path is a URL
+                formData.append('fileUrl', file.path);
+            }
+
+            try {
+                const mmsResponse = await fetch('/upload-and-send-mms', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!mmsResponse.ok) {
+                    const errorText = await mmsResponse.text();
+                    throw new Error(errorText || 'Unknown error occurred');
+                }
+
+                alert('MMS sent successfully');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    });
+</script>
+
+<style>
+    #file-explorer div {
+        padding: 8px;
+        cursor: pointer;
+    }
+
+    #file-explorer div.selected {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Additional styles to prevent modal-related CSS issues */
+    .modal-backdrop {
+        position: relative;
+        z-index: 0;
+    }
+</style>
+
+{% endblock %}

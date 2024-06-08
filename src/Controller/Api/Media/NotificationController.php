@@ -83,8 +83,8 @@ class NotificationController extends MainController
             return $this->json(['error' => 'Missing required parameters.'], Response::HTTP_BAD_REQUEST);
         }
         // Handle file upload
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $newFilename = uniqid() . '.' . $file->guessExtension();
+        $Filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $newFilename = $Filename . '.' . $file->guessExtension();
 
         try {
             $file->move($this->uploadDirectory, $newFilename);
@@ -94,10 +94,13 @@ class NotificationController extends MainController
 
         // Generate download URL
         $fileUrl = $request->getSchemeAndHttpHost() . '/download.php?file=' . $newFilename;
-        dd($fileUrl);
+
+        //$fileUrl = "https://omika.fr/upload/665d7be89fd1c-Blockchain-1024x640.jpg";
         try {
             // Send MMS with Twilio
             $this->twilioService->sendMms($to, $body, $fileUrl);
+            // remove temporary file
+            unlink($this->uploadDirectory . '/' . $newFilename);
             return $this->json(['message' => 'MMS sent successfully.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Failed to send MMS: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
