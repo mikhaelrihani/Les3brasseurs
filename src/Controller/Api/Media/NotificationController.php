@@ -6,6 +6,7 @@ use App\Controller\MainController;
 use App\Service\TwilioService;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport;
@@ -13,6 +14,8 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+
+#[Route('/api/notification')]
 class NotificationController extends MainController
 {
 
@@ -63,6 +66,28 @@ class NotificationController extends MainController
         }
     }
 
+    //! Generate public url by uploading choosen file in public directory of application
+    #[Route('/generatePublicUrl', name: 'app_api_notification_uploadPublic', methods: ['POST'])]
+    public function generatePublicUrl($file): JsonResponse
+    {
+        if (!$file) {
+            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $Filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $newFilename = $Filename . '.' . $file->guessExtension();
+        try {
+            $file->move($this->uploadDirectory, $newFilename);
+        } catch (FileException $e) {
+            return $this->json(['error' => 'Failed to upload file: ' . $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+        //generate file url with headers for download
+        $fileUrl = $this->getParameter('public_path') . '/download.php?file=' . $newFilename;
+        //$fileUrl = "https://omika.fr/upload/665d7be89fd1c-Blockchain-1024x640.jpg";
+
+        return new JsonResponse(['fileUrl' => $fileUrl], Response::HTTP_OK);
+    }
+
 
     // Résumé du flux d'envoi de fichiers via MMS avec Twilio.
     // L'utilisateur upload un fichier ou sélectionne un fichier depuis un dossier externe.
@@ -71,36 +96,24 @@ class NotificationController extends MainController
     // Le MMS est envoyé en utilisant l'URL publique.
     // Le fichier est supprimé du serveur après l'envoi.
     // L'utilisateur reçoit un lien de téléchargement pour récupérer le fichier.
-    #[Route('/upload-and-send-mms', name: 'upload_and_send_mms', methods: ['POST'])]
+    #[Route('/upload-and-send-mms', name: 'app_api_notification_upload_and_send_mms', methods: ['POST'])]
     public function uploadAndSendMms(Request $request): Response
     {
         $to = $request->request->get('to');
         $file = $request->files->get('file');
         $body = $request->request->get('body');
 
-
         if (!$to || !$body || !$file) {
             return $this->json(['error' => 'Missing required parameters.'], Response::HTTP_BAD_REQUEST);
         }
-        // Handle file upload
-        $Filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $newFilename = $Filename . '.' . $file->guessExtension();
+
+        $jsonContent = $this->generatePublicUrl($file)->getContent();
+        $fileUrl = json_decode($jsonContent, true)[ "fileUrl" ];
 
         try {
-            $file->move($this->uploadDirectory, $newFilename);
-        } catch (FileException $e) {
-            return $this->json(['error' => 'Failed to upload file: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        // Generate download URL
-        $fileUrl = $request->getSchemeAndHttpHost() . '/download.php?file=' . $newFilename;
-
-        //$fileUrl = "https://omika.fr/upload/665d7be89fd1c-Blockchain-1024x640.jpg";
-        try {
-            // Send MMS with Twilio
             $this->twilioService->sendMms($to, $body, $fileUrl);
             // remove temporary file
-            unlink($this->uploadDirectory . '/' . $newFilename);
+            // unlink($this->uploadDirectory . '/' . $newFilename);
             return $this->json(['message' => 'MMS sent successfully.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Failed to send MMS: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

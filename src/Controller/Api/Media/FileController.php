@@ -10,12 +10,11 @@ use App\Service\PhpseclibService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Requirement\Requirement;
+
 
 
 #[Route('/api/files')]
@@ -72,7 +71,7 @@ class FileController extends MainController
         return new JsonResponse(['files' => $fileData], Response::HTTP_OK);
     }
     
-    //! UPLOAD FILE in external directory of application
+    //! UPLOAD FILE to external storage
     #[Route('/upload', name: 'app_api_file_upload', methods: ['POST'])]
     public function upload(Request $request): JsonResponse
     {
@@ -113,33 +112,9 @@ class FileController extends MainController
         ]);
     }
 
-    //! UPLOAD FILE in public directory of application
-    #[Route('/uploadPublic', name: 'app_api_file_uploadPublic', methods: ['POST'])]
-    public function uploadPublic(Request $request): JsonResponse
-    {
-        $file = $request->files->get('file');
-
-        if (!$file) {
-            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $uploadDirectory = $this->getParameter('upload_directory');
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $newFilename = uniqid() . '-' . $originalFilename . '.' . $file->guessExtension();
-
-        try {
-            $file->move($uploadDirectory, $newFilename);
-        } catch (FileException $e) {
-            return new JsonResponse(['error' => 'Failed to upload file'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $publicPath = $this->getParameter('public_path') . '/upload/' . $newFilename;
-
-        return new JsonResponse(['url' => $publicPath], Response::HTTP_OK);
-    }
-
-
-    //! Download FILE from external Files folder to public directory of application or to local directory
+    //! Download FILE from external storage --> to public directory of application
+    //! return the public_file_url 
+    //! or return the file itself by downloading it locally
 
     #[Route('/download/{location}', name: 'app_api_file_download', methods: ['POST'])]
     public function download(Request $request, string $location = "local"): Response
