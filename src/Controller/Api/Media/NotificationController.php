@@ -4,7 +4,9 @@ namespace App\Controller\Api\Media;
 
 use App\Controller\MainController;
 use App\Service\TwilioService;
+use App\Service\UploadService;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,21 +26,25 @@ class NotificationController extends MainController
     private $texter;
     private $twilioService;
     private $uploadDirectory;
+   
+
 
     public function __construct(
         ParameterBagInterface $params,
         TwilioTransport $twilioTransport,
         TexterInterface $texter,
-        TwilioService $twilioService
+        TwilioService $twilioService,
+      
     ) {
         $this->params = $params;
         $this->twilioTransport = $twilioTransport;
         $this->texter = $texter;
         $this->twilioService = $twilioService;
         $this->uploadDirectory = $params->get('upload_directory');
+    
     }
 
-    #[Route('/send-sms', name: 'send_sms', methods: ['POST'])]
+    #[Route('/sendSms', name: 'sendSms', methods: ['POST'])]
 
     public function sendSms(Request $request): Response
     {
@@ -66,38 +72,15 @@ class NotificationController extends MainController
         }
     }
 
-    //! Generate public url by uploading choosen file in public directory of application
-    #[Route('/generatePublicUrl', name: 'app_api_notification_uploadPublic', methods: ['POST'])]
-    public function generatePublicUrl($file): JsonResponse
-    {
-        if (!$file) {
-            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $Filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $newFilename = $Filename . '.' . $file->guessExtension();
-        try {
-            $file->move($this->uploadDirectory, $newFilename);
-        } catch (FileException $e) {
-            return $this->json(['error' => 'Failed to upload file: ' . $e->getMessage()], Response::HTTP_BAD_REQUEST);
-        }
-        //generate file url with headers for download
-        $fileUrl = $this->getParameter('public_path') . '/download.php?file=' . $newFilename;
-        //$fileUrl = "https://omika.fr/upload/665d7be89fd1c-Blockchain-1024x640.jpg";
-
-        return new JsonResponse(['fileUrl' => $fileUrl], Response::HTTP_OK);
-    }
-
-
     // Résumé du flux d'envoi de fichiers via MMS avec Twilio.
     // L'utilisateur upload un fichier ou sélectionne un fichier depuis un dossier externe.
-    // Le fichier est téléchargé dans public/upload.
-    // Une URL publique est générée pour le fichier téléchargé.
+    // Le media est téléchargé dans public/upload.
+    // Une URL publique est générée pour le media du mms.
     // Le MMS est envoyé en utilisant l'URL publique.
-    // Le fichier est supprimé du serveur après l'envoi.
-    // L'utilisateur reçoit un lien de téléchargement pour récupérer le fichier.
-    #[Route('/upload-and-send-mms', name: 'app_api_notification_upload_and_send_mms', methods: ['POST'])]
-    public function uploadAndSendMms(Request $request): Response
+    // Le fichier est supprimé du dossier public/upload après l'envoi.
+    
+    #[Route('/sendMms', name: 'app_api_notification_sendMms', methods: ['POST'])]
+    public function sendMms(Request $request): Response
     {
         $to = $request->request->get('to');
         $file = $request->files->get('file');
@@ -106,18 +89,18 @@ class NotificationController extends MainController
         if (!$to || !$body || !$file) {
             return $this->json(['error' => 'Missing required parameters.'], Response::HTTP_BAD_REQUEST);
         }
-
-        $jsonContent = $this->generatePublicUrl($file)->getContent();
-        $fileUrl = json_decode($jsonContent, true)[ "fileUrl" ];
-
+        $filename = $file->getClientOriginalName();
+        //generate public media url 
+        $mediaUrl = $this->getParameter('public_path') . '/download.php?file=' . urlencode($filename);
+   
         try {
-            $this->twilioService->sendMms($to, $body, $fileUrl);
+           $this->twilioService->sendMms($to, $body, $mediaUrl);
             // remove temporary file
-            // unlink($this->uploadDirectory . '/' . $newFilename);
+           unlink($this->uploadDirectory . '/' . $filename);
             return $this->json(['message' => 'MMS sent successfully.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Failed to send MMS: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
+    
 }

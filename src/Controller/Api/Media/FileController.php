@@ -26,7 +26,7 @@ class FileController extends MainController
     private ParameterBagInterface $params;
 
 
-    function __construct(PhpseclibService $phpseclibService, FileService $fileService, MailerService $mailerService,ParameterBagInterface $params)
+    function __construct(PhpseclibService $phpseclibService, FileService $fileService, MailerService $mailerService, ParameterBagInterface $params)
     {
         $this->phpseclibService = $phpseclibService;
         $this->fileService = $fileService;
@@ -59,21 +59,38 @@ class FileController extends MainController
     public function getFilesExplorerData(): JsonResponse
     {
         $files = $this->phpseclibService->listFiles();
-    
+
         $basePath = $this->params->get('fileUploadDirectory');
-        $fileData = array_map(function($file) use ($basePath) {
+        $fileData = array_map(function ($file) use ($basePath) {
             return [
                 'name' => basename($file),
                 'path' => $basePath . '/' . $file
             ];
         }, $files);
-   
+
         return new JsonResponse(['files' => $fileData], Response::HTTP_OK);
     }
-    
+    //!UPLOAD FILE TO PUBLIC DIRECTORY OF APPLICATION
+
+
+    #[Route('/uploadApp', name: 'app_api_file_uploadApp', methods: ['POST'])]
+    public function uploadApp($file): JsonResponse
+    {
+        if (!$file) {
+            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+        }
+        $fileName = $file->getClientOriginalName();
+        $file->move($this->params->get('fileUploadDirectory'), $fileName);
+        return new JsonResponse([
+            'message' => 'File uploaded successfully'
+        ]);
+
+    }
+
+
     //! UPLOAD FILE to external storage
-    #[Route('/upload', name: 'app_api_file_upload', methods: ['POST'])]
-    public function upload(Request $request): JsonResponse
+    #[Route('/uploadExternal', name: 'app_api_file_uploadExternal', methods: ['POST'])]
+    public function uploadExternal(Request $request): JsonResponse
     {
         // Récupérer le fichier téléversé depuis la requête
         $uploadedFile = $request->files->get('file');
