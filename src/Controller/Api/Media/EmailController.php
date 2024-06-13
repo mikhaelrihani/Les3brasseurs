@@ -9,8 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 
-//! modele a utiliser dans d autre controller
-#[Route('/api/mails')]
+#[Route('/api/email')]
 class EmailController extends MainController
 {
     private EmailFacadeService $emailFacade;
@@ -23,7 +22,7 @@ class EmailController extends MainController
 
     }
     
-    #[Route('/', name: 'app_api_mail_sendEmailFromRequest')]
+    #[Route('/sendEmailFromRequest', name: 'app_api_email_sendEmailFromRequest')]
     public function sendEmailFromRequest(): Response
     {
         try {
@@ -34,7 +33,7 @@ class EmailController extends MainController
         }
     }
 
-    #[Route('/welcomeMail', name: 'app_api_mail_welcomeMail')]
+    #[Route('/sendWelcomeEmail', name: 'app_api_email_sendWelcomeEmail')]
     public function sendWelcomeEmail($username = null): Response
     {
         //$username = "omika";

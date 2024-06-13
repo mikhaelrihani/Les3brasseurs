@@ -47,15 +47,8 @@ class FileController extends MainController
 
     }
 
-    //! GET Form to send MMS
-    #[Route('/sendMms', name: 'app_file_sendMms', methods: ['GET'])]
-    public function getFilesExplorerMms(): Response
-    {
-        return $this->render('sendMms.html.twig');
-    }
-
     //! GET FILES EXPLORER data
-    #[Route('/explorer-data', name: 'app_file_explorer_data', methods: ['GET'])]
+    #[Route('/explorer-data', name: 'app_api_file_explorer_data', methods: ['GET'])]
     public function getFilesExplorerData(): JsonResponse
     {
         $files = $this->phpseclibService->listFiles();
@@ -162,11 +155,6 @@ class FileController extends MainController
         if ($location == 'public') {
             return $this->file($filePublicPath);
         }
-        // $response = new Response(file_get_contents($filePublicPath));
-        // $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
-        // $response->headers->set('Content-Type', mime_content_type($filePublicPath));
-        // $response->headers->set('Content-Length', filesize($filePublicPath));
-        // return $response;
 
         return new BinaryFileResponse($filePublicPath);
     }
