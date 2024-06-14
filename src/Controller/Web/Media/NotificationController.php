@@ -6,13 +6,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/web/notification')]
 class NotificationController extends AbstractController
 {
-    #[Route('/web/media/notification', name: 'app_web_media_notification')]
-    public function index(): Response
+    #[Route('/sendMms', name: 'app_web_notification_sendMms')]
+    public function sendMms(): Response
     {
-        return $this->render('web/media/notification/index.html.twig', [
-            'controller_name' => 'NotificationController',
-        ]);
+        return $this->render('sendMms.html.twig');
     }
 }

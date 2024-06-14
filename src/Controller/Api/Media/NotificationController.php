@@ -5,6 +5,7 @@ namespace App\Controller\Api\Media;
 use App\Controller\MainController;
 use App\Service\TwilioService;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,7 +17,8 @@ class NotificationController extends MainController
     private $twilioService;
     private $uploadDirectory;
 
-    public function __construct(ParameterBagInterface $params,TwilioService $twilioService,) {
+    public function __construct(ParameterBagInterface $params, TwilioService $twilioService, )
+    {
         $this->twilioService = $twilioService;
         $this->uploadDirectory = $params->get('upload_directory');
     }
@@ -38,10 +40,13 @@ class NotificationController extends MainController
     public function sendMms(Request $request): Response
     {
         $parameters = $this->getTwilioParameters($request);
+        if ($parameters instanceof JsonResponse) {
+            return $parameters;
+        }
         try {
-            $this->twilioService->sendMms($parameters[ 'to' ], $parameters[ 'body' ],$parameters[ 'mediaUrl' ]);
+            $this->twilioService->sendMms($parameters[ 'to' ], $parameters[ 'body' ], $parameters[ 'mediaUrl' ]);
             // remove temporary file
-            unlink($this->uploadDirectory . '/' .$parameters[ 'filename' ]);
+            unlink($this->uploadDirectory . '/' . $parameters[ 'filename' ]);
             return $this->json(['message' => 'MMS sent successfully.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -53,7 +58,7 @@ class NotificationController extends MainController
     {
         $parameters = $this->getTwilioParameters($request);
         try {
-            $this->twilioService->sendWhatsapp($parameters[ 'to' ], $parameters[ 'body' ],$parameters[ 'mediaUrl' ]);
+            $this->twilioService->sendWhatsapp($parameters[ 'to' ], $parameters[ 'body' ], $parameters[ 'mediaUrl' ]);
             // remove temporary file
             unlink($this->uploadDirectory . '/' . $parameters[ 'filename' ]);
             return $this->json(['message' => 'Whatsapp sent successfully.'], Response::HTTP_OK);
@@ -66,7 +71,7 @@ class NotificationController extends MainController
     {
         $to = $request->request->get('to');
         $body = $request->request->get('body');
-        
+
         if (!$to || !$body) {
             return $this->json(['error' => 'Missing required parameters.'], Response::HTTP_BAD_REQUEST);
         }
@@ -76,12 +81,19 @@ class NotificationController extends MainController
         $parameters[ 'body' ] = $body;
 
         $file = $request->files->get('file');
+        $fileUrl = $request->request->get('fileUrl');
+
         if ($file) {
             $filename = $file->getClientOriginalName();
             $parameters[ 'filename' ] = $filename;
+            $file->move($this->uploadDirectory, $filename);
             //generate public media url 
             $mediaUrl = $this->getParameter('public_path') . '/download.php?file=' . urlencode($filename);
             $parameters[ 'mediaUrl' ] = $mediaUrl;
+
+        } else if ($fileUrl) {
+            $parameters[ 'mediaUrl' ] = $this->getParameter('public_path') . "/" . $fileUrl;
+            $parameters[ 'filename' ] = $request->request->get('filename');
         }
 
         return $parameters;

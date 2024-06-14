@@ -69,7 +69,8 @@ class FileController extends MainController
         $fileData = array_map(function ($file) use ($basePath) {
             return [
                 'name' => basename($file),
-                'path' => $basePath . '/' . $file
+                'path' => $basePath . '/' . $file,
+                'type' => 'file'
             ];
         }, $files);
 

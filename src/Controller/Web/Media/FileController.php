@@ -10,8 +10,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class FileController extends AbstractController
 {
     //! GET Files Explorer from external storage
-    #[Route('/getFilesExplorer', name: 'app_web_file_getFilesExplorer', methods: ['GET'])]
-    public function getFilesExplorer(): Response
+    #[Route('/FilesExplorer', name: 'app_web_file_FilesExplorer', methods: ['GET'])]
+    public function FilesExplorer(): Response
     {
         return $this->render('filesExplorer.html.twig');
     }
