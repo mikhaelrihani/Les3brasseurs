@@ -4,7 +4,7 @@ namespace App\Controller\Api\Media;
 
 use App\Controller\MainController;
 use App\Repository\FileRepository;
-use App\Service\FileService;
+use App\Service\FileDatabaseService;
 use App\Service\MailerService;
 use App\Service\PhpseclibService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,21 +21,20 @@ use Symfony\Component\HttpFoundation\Response;
 class FileController extends MainController
 {
     private PhpseclibService $phpseclibService;
-    private FileService $fileService;
+    private FileDatabaseService $fileDatabaseService;
     private MailerService $mailerService;
     private ParameterBagInterface $params;
 
 
-    function __construct(PhpseclibService $phpseclibService, FileService $fileService, MailerService $mailerService, ParameterBagInterface $params)
+    function __construct(PhpseclibService $phpseclibService, FileDatabaseService $fileDatabaseService, MailerService $mailerService, ParameterBagInterface $params)
     {
         $this->phpseclibService = $phpseclibService;
-        $this->fileService = $fileService;
+        $this->fileDatabaseService = $fileDatabaseService;
         $this->mailerService = $mailerService;
         $this->params = $params;
     }
 
     //! GET FILE 
-
     #[Route('/{id}', name: 'app_api_file_getFile', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function getFile(int $id, FileRepository $fileRepository): JsonResponse
     {
@@ -47,9 +46,22 @@ class FileController extends MainController
 
     }
 
-    //! GET FILES EXPLORER data
-    #[Route('/explorer-data', name: 'app_api_file_explorer_data', methods: ['GET'])]
-    public function getFilesExplorerData(): JsonResponse
+    //! GET FILE BY
+    #[Route('/{param_key}/{param_value}', name: 'app_api_file_getFile', methods: ['GET'])]
+    public function getFileby(string $param_key,string $param_value, FileRepository $fileRepository): JsonResponse
+    {
+        $file = $fileRepository->findBy([$param_key => $param_value]);
+       
+        if (!$file)
+            return new JsonResponse(['error' => 'File not found'], Response::HTTP_NOT_FOUND);
+
+        return $this->json($file, Response::HTTP_OK, [], ['groups' => 'fileWithRelation']);
+
+    }
+
+    //! GET FILES EXPLORER from external storage
+    #[Route('/explorer', name: 'app_api_file_explorer', methods: ['GET'])]
+    public function getFilesExplorer(): JsonResponse
     {
         $files = $this->phpseclibService->listFiles();
 
@@ -63,12 +75,13 @@ class FileController extends MainController
 
         return new JsonResponse(['files' => $fileData], Response::HTTP_OK);
     }
-    //!UPLOAD FILE TO PUBLIC DIRECTORY OF APPLICATION
 
 
+    //! UPLOAD FILE TO PUBLIC DIRECTORY OF APPLICATION
     #[Route('/uploadApp', name: 'app_api_file_uploadApp', methods: ['POST'])]
-    public function uploadApp($file): JsonResponse
+    public function uploadApp(Request $request): JsonResponse
     {
+        $file = $request->files->get('file');
         if (!$file) {
             return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         }
@@ -110,9 +123,9 @@ class FileController extends MainController
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        //  Ajouter le path du fichier à la base de données
+        //  Referencer le fichier dans la base de données
 
-        $this->fileService->postDb($doctype, $remoteFilePath, $fileName);
+        $this->fileDatabaseService->postDb($doctype, $remoteFilePath, $fileName);
 
         // envoyer un email de confirmation pour le fichier téléversé
         $sentMessage = $this->mailerService->sendEmail("contact@omika.fr", "file uploaded with success to omika server", "im the file body");

@@ -6,7 +6,7 @@ use App\Entity\Picture;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
-class ImageEntityService
+class ImageDatabaseService
 {
     private $em;
 

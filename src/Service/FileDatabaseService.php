@@ -6,7 +6,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 
-class FileService
+class FileDatabaseService
 {
     private $entityManager;
 
