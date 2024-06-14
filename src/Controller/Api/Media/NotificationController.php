@@ -46,7 +46,7 @@ class NotificationController extends MainController
         try {
             $this->twilioService->sendMms($parameters[ 'to' ], $parameters[ 'body' ], $parameters[ 'mediaUrl' ]);
             // remove temporary file
-            unlink($this->uploadDirectory . '/' . $parameters[ 'filename' ]);
+            unlink($this->uploadDirectory . '/' . $parameters[ 'fileName' ]);
             return $this->json(['message' => 'MMS sent successfully.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -60,7 +60,9 @@ class NotificationController extends MainController
         try {
             $this->twilioService->sendWhatsapp($parameters[ 'to' ], $parameters[ 'body' ], $parameters[ 'mediaUrl' ]);
             // remove temporary file
-            unlink($this->uploadDirectory . '/' . $parameters[ 'filename' ]);
+            $fileTempPath = $this->uploadDirectory . '/' . $parameters[ 'fileName' ];
+            if (file_exists($fileTempPath)) { unlink($fileTempPath); }
+           // unlink($this->uploadDirectory . '/' . $parameters[ 'fileName' ]);
             return $this->json(['message' => 'Whatsapp sent successfully.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Failed to send Whatsapp: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -81,20 +83,17 @@ class NotificationController extends MainController
         $parameters[ 'body' ] = $body;
 
         $file = $request->files->get('file');
-        $fileUrl = $request->request->get('fileUrl');
-
+        // $fileUrl = $request->request->get('fileUrl');
         if ($file) {
-            $filename = $file->getClientOriginalName();
-            $parameters[ 'filename' ] = $filename;
-            $file->move($this->uploadDirectory, $filename);
-            //generate public media url 
-            $mediaUrl = $this->getParameter('public_path') . '/download.php?file=' . urlencode($filename);
-            $parameters[ 'mediaUrl' ] = $mediaUrl;
-
-        } else if ($fileUrl) {
-            $parameters[ 'mediaUrl' ] = $this->getParameter('public_path') . "/" . $fileUrl;
-            $parameters[ 'filename' ] = $request->request->get('filename');
+            $fileName = $file->getClientOriginalName();
+            $file->move($this->uploadDirectory, $fileName);
+        } else {
+            $fileName = $request->request->get('fileName');
         }
+        $parameters[ 'fileName' ] = $fileName;
+        //generate public media url 
+        $mediaUrl = $this->getParameter('public_path') . "/upload/" . urlencode($fileName);
+        $parameters[ 'mediaUrl' ] = $mediaUrl;
 
         return $parameters;
     }

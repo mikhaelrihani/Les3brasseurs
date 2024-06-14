@@ -68,7 +68,7 @@
                 const fileElement = document.createElement('div');
                 fileElement.textContent = file.name;
                 fileElement.dataset.fileName = file.name;
-                fileElement.dataset.filePath = file.path;
+                //fileElement.dataset.filePath = file.path;
                 fileElement.addEventListener('click', () => selectExternalFile(fileElement));
                 fileExplorer.appendChild(fileElement);
             });
@@ -106,7 +106,7 @@
             const body = document.getElementById('messageBody').value;
             const fileInput = document.getElementById('localFileInput').files[0];
             const selectedExternalFile = document.querySelector('#externalFile div.selected');
-            const selectedFilePath = selectedExternalFile ? selectedExternalFile.dataset.filePath : null;
+           // const selectedFilePath = selectedExternalFile ? selectedExternalFile.dataset.filePath : null;
             const selectedLocalFile = fileInput ? fileInput : null;
             const externalFileName = selectedExternalFile ? selectedExternalFile.dataset.fileName : null;
 
@@ -117,7 +117,7 @@
             if (selectedLocalFile) {
                 selectedData.append('file', selectedLocalFile);
             } else if (selectedFilePath) {
-                selectedData.append('fileUrl', selectedFilePath);
+                //selectedData.append('fileUrl', selectedFilePath);
                 selectedData.append('fileName', externalFileName);
             }
 
@@ -138,7 +138,7 @@
                 const responseJson = await mmsResponse.json();
                 console.log('MMS sent successfully:', responseJson);
             } catch (error) {
-                console.error('Error sending MMS:', error);
+                console.log('Error sending MMS:', error);
             }
         }
 
