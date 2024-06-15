@@ -62,12 +62,6 @@ class NotificationController extends MainController
         $parameters = $this->getTwilioParameters($request);
         try {
             $this->twilioService->sendWhatsapp($parameters[ 'to' ], $parameters[ 'body' ], $parameters[ 'mediaUrl' ]);
-            // remove temporary file
-            $fileTempPath = $this->uploadDirectory . '/' . $parameters[ 'fileName' ];
-
-            if (file_exists($fileTempPath)) {
-                unlink($fileTempPath);
-            }
             return $this->json(['message' => 'Whatsapp sent successfully.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Failed to send Whatsapp: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

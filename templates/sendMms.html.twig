@@ -51,13 +51,14 @@
 			</div>
 		</div>
 	</div>
-
+	<input
+	type="hidden" id="selectedFilePath" name="selectedFilePath">
 	<!-- Bootstrap JS and dependencies -->
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', async () => { // Function to fetch and populate external files
+		document.addEventListener('DOMContentLoaded', async () => {
 async function fetchAndPopulateFiles() {
 const response = await fetch('/api/files/explorer');
 const data = await response.json();
@@ -68,27 +69,28 @@ data.files.forEach(file => {
 const fileElement = document.createElement('div');
 fileElement.textContent = file.name;
 fileElement.dataset.fileName = file.name;
+fileElement.dataset.filePath = file.path;
 fileElement.addEventListener('click', () => selectExternalFile(fileElement));
 fileExplorer.appendChild(fileElement);
 });
 }
 
-// Function to select an external file
 function selectExternalFile(fileElement) {
 document.querySelectorAll('#externalFile div').forEach(div => div.classList.remove('selected'));
 fileElement.classList.add('selected');
 document.getElementById('localFileInput').value = ''; // Clear local file input selection
 }
 
-// Function to handle file selection
 function handleFileSelection() {
 const selectedExternalFile = document.querySelector('#externalFile div.selected');
 const selectedLocalFile = document.getElementById('localFileInput').files[0];
 
 if (selectedExternalFile) {
 document.getElementById('selectedFile').value = selectedExternalFile.dataset.fileName;
+document.getElementById('selectedFilePath').value = selectedExternalFile.dataset.filePath;
 } else if (selectedLocalFile) {
 document.getElementById('selectedFile').value = selectedLocalFile.name;
+document.getElementById('selectedFilePath').value = '';
 } else {
 alert('Please select a file.');
 return;
@@ -99,7 +101,6 @@ const bootstrapModal = bootstrap.Modal.getInstance(modal);
 bootstrapModal.hide();
 }
 
-// Function to handle MMS sending
 async function handleMmsSending() {
 const to = document.getElementById('phoneNumber').value;
 const body = document.getElementById('messageBody').value;
@@ -107,6 +108,7 @@ const fileInput = document.getElementById('localFileInput').files[0];
 const selectedExternalFile = document.querySelector('#externalFile div.selected');
 const selectedLocalFile = fileInput ? fileInput : null;
 const externalFileName = selectedExternalFile ? selectedExternalFile.dataset.fileName : null;
+const externalFilePath = document.getElementById('selectedFilePath').value;
 
 const selectedData = new FormData();
 selectedData.append('to', to);
@@ -132,18 +134,29 @@ mmsResponse.status
 
 const responseJson = await mmsResponse.json();
 console.log('MMS sent successfully:', responseJson);
+
+// If external file, send a request to delete the file
+if (externalFilePath) {
+await fetch('/api/files/delete', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{path: externalFilePath}
+)
+});
+}
 } catch (error) {
 console.log('Error sending MMS:', error);
 }
 }
 
-// Initial setup
 await fetchAndPopulateFiles();
 document.getElementById('selectFileBtn').addEventListener('click', handleFileSelection);
 document.getElementById('sendMmsBtn').addEventListener('click', handleMmsSending);
 });
 	</script>
-
 
 	<style>
 		#externalFile div {

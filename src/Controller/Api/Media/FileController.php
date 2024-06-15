@@ -175,7 +175,7 @@ class FileController extends MainController
 
     //! DELETE FILE
 
-    #[Route('/delete/{id}', name: 'app_api_file_delete', methods: ['DELETE'])]
+    #[Route('/delete/{id}', name: 'app_api_file_deletebyId', methods: ['DELETE'])]
 
     public function delete(int $id, FileRepository $fileRepository, EntityManagerInterface $em): JsonResponse
     {
@@ -200,6 +200,20 @@ class FileController extends MainController
         return new JsonResponse([
             'message' => 'File deleted successfully'
         ]);
+    }
+
+    #[Route('/delete', name: 'app_api_delete_file', methods: ['POST'])]
+    public function deleteFile(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $filePath = $data['path'];
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
+            return new JsonResponse(['message' => 'File deleted successfully.'], Response::HTTP_OK);
+        }
+
+        return new JsonResponse(['error' => 'File not found.'], Response::HTTP_NOT_FOUND);
     }
 
 }
