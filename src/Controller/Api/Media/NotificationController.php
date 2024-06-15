@@ -40,7 +40,6 @@ class NotificationController extends MainController
     public function sendMms(Request $request): Response
     {
         $parameters = $this->getTwilioParameters($request);
-        dd($parameters);
         if ($parameters instanceof JsonResponse) {
             return $parameters;
         }
