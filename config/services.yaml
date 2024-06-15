@@ -10,8 +10,6 @@ parameters:
     app.admin_phone_number: '%env(APP_ADMIN_PHONE_NUMBER)%'
     upload_directory: '%kernel.project_dir%/public/upload'
     public_path: '%env(resolve:APP_URL)%'
-   
-
 
 services:
     # default configuration for services in *this* file
