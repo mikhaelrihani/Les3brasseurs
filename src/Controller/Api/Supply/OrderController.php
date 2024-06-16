@@ -90,9 +90,19 @@ class OrderController extends MainController
 
 
     //! POST ORDER
-    //! create order, create xcell or pdf(service), send email notification
-    #[Route('/post', name: 'app_api_supplier_postSuppplier', methods: 'POST')]
-    public function postSuppplier(
+    //! create order, create excel or pdf(service), send email notification
+    // pour creer une commande le front appelle une route "create"qui va construire un doc de type excel
+    // propre a un supplier passé en parametre 
+    // on recupere les data products et supplierInfo 
+    // on recupere un excel vierge stocké dans le dossier public
+    // (ou on upload un excel dans le dossier public si on veut modifier les valeurs de la commande)
+    // on fait appel au service spreadsheet qui va construire le document excel
+    // depuis la recuperation d un document excel type existant ou de zero
+    // on renvoi le document excel au front qui va le remplir et ensuite le renvoyer a une autre route "post"
+    // pour stocker cette commande dans la base de donnée et envoyer un mail au fournisseur et renvoyer un
+    // json de success pour que le front puisse afficher un message de success
+    #[Route('/post', name: 'app_api_order_postOrder', methods: 'POST')]
+    public function postOrder(
         Request $request,
         SerializerInterface $serializer,
         EntityManagerInterface $em,

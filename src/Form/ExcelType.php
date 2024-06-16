@@ -8,13 +8,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 
-class UploadFormType extends AbstractType
+class ExcelType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('excelFile', FileType::class, [
-                'label' => 'Excel File',
+                'label' => 'Select Excel File',
+                'mapped' => false,
+                'required' => true,
                 'constraints' => [
                     new File([
                         'maxSize' => '1024k',
@@ -27,8 +29,10 @@ class UploadFormType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver) :void
     {
-        $resolver->setDefaults([]);
+        $resolver->setDefaults([
+          
+        ]);
     }
 }
