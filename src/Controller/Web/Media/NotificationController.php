@@ -12,6 +12,6 @@ class NotificationController extends AbstractController
     #[Route('/sendMms', name: 'app_web_notification_sendMms')]
     public function sendMms(): Response
     {
-        return $this->render('sendMms.html.twig');
+        return $this->render('App_body/media/notification/mms.html.twig');
     }
 }

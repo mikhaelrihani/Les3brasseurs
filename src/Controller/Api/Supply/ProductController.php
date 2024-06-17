@@ -8,7 +8,7 @@ use App\Entity\Room;
 use App\Entity\Supplier;
 use App\Entity\SupplyType;
 use App\Repository\ProductRepository;
-use App\Service\ImageEntityService;
+use App\Service\ImageDatabaseService;
 use App\Service\ImageKitService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -167,12 +167,12 @@ class ProductController extends MainController
         int $id,
         Request $request,
         ImageKitService $imageKit,
-        ImageEntityService $imageEntityService,
+        ImageDatabaseService $imageDatabaseService,
     ): JsonResponse {
 
         $pictures = $request->files->all();
         $uploadedPictures = $imageKit->uploadUniquePictures($pictures);
-        $product = $imageEntityService->addPictures(Product::class, $id, $uploadedPictures);
+        $product = $imageDatabaseService->addPictures(Product::class, $id, $uploadedPictures);
 
         return $this->json($product, Response::HTTP_OK, [], ["groups" => "productWithRelation"]);
 

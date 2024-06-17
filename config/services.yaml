@@ -52,9 +52,7 @@ services:
             $accountSid: '%env(TWILIO_ACCOUNT_SID)%'
             $authToken: '%env(TWILIO_AUTH_TOKEN)%'
             $from: '%env(TWILIO_FROM_NUMBER)%'                 
-    App\Service\ExcelService:
-        arguments:
-            $templatePath: '%kernel.project_dir%/templates/excel/blank.xlsx'
+   
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     # mailerService

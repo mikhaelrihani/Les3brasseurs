@@ -1,8 +1,7 @@
 <?php
-namespace App\Controller;
+namespace App\Controller\Web\Media;
 
 use App\Form\ExcelType;
-use App\Form\SelectFileType;
 use App\Service\MailerService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -13,8 +12,35 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\String\Slugger\SluggerInterface;
+
+// l utilisateur clic sur le menu "inventaire" et peut choisir entre nouveau, actuel, archive
+
+// si archive route twig pour afficher une modal, cette modal s ouvre avec un widget selection mois annee actuelle
+// et il y aura sur la vue de l inventaire un bouton telecharger et l inventaire sera de suite editable avec un bouton sauvegarder 
+
+// si nouveau ou actuel alors on est dirige vers une route api qui va recuperer le mois passe et l annee actuelle
+// puis rediriger vers la route api "check if inventory exist"
+// cette route va d abord creer un nom de fichier avec les dates et annees selectionnees
+// cette route interroge la bdd pour savoir si l inventaire existe deja sur external storage 
+// cette route nous retourne un boolean
+// si true js fetch la route api  qui download le fichier excel depuis external storage vers public storage
+// si false la modal s'agrandit avec un bouton "select excel file" qui va ouvrir l explorateur de fichier pour selectionner un fichier excel
+// puis au clic sur le bouton js fetch la route pour l'upload d'un fichier excel depuis local storage vers public storage
+// ensuite dans les 2 cas js fetch la route twig edit avec en parametre la variable "exist" et le path du fichier excel
+// cette route va utiliser le service spreadsheet pour lire le fichier excel et renvoyer les datas a la vue twig edit
+// l utilisateur peut editer les datas de l inventaire sur cette vue twig
+// cette vue twig a un bouton "sauvegarder" qui va nous rediriger vers une route web "update file"avec les datas de l inventaire et les variables "exist" et "filename"
+// cette route web utilise le service spreadsheet pour mettre a jour le fichier excel avec les datas modifiees
+// cette route renvoie un boolean avec les variables "exist" et "filename"
+// si false alors on affiche un message d erreur sur la vue twig edit et affiche le fichier excel a editer avec les datas modifiees et les erreurs
+// si true alors js check si exist=false ou exist=true
+// si exist=false js fetch la route api qui upload le fichier excel depuis public storage vers external storage
+// si exist=true js fetch la route api qui update le fichier excel depuis public storage vers external storage
+// cette route api update efface le fichier existant pour eviter les doublons
+// cette route api update renvoi un boolean true si tout s est bien passe
+// si true js fetch la route api delete qui efface le fichier excel depuis public storage
+
 
 #[Route("/web/excel")]
 class ExcelController extends AbstractController
@@ -107,7 +133,7 @@ class ExcelController extends AbstractController
     //     ]);
     // }
 
-  
+
     #[Route("/modify/{fileName}", name: "modify_excel")]
     public function modifyExcel(string $fileName): Response
     {
@@ -138,7 +164,7 @@ class ExcelController extends AbstractController
     #[Route("/excel/{fileName}", name: "update_excel", methods: ["POST"])]
     public function saveExcel(Request $request, $fileName): Response
     {
-        $filePath =  $this->uploadDirectory . $fileName;
+        $filePath = $this->uploadDirectory . $fileName;
 
         $modifiedData = json_decode($request->getContent(), true);
 
@@ -160,7 +186,7 @@ class ExcelController extends AbstractController
                     } else {
                         $sheet->setCellValueExplicit($cellCoordinate, $cellValue, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     }
-                    
+
                 }
             }
 
